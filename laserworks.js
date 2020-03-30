@@ -50,7 +50,7 @@ turn=0
 
 // Level data
 current_level=0
-total_levels=6
+total_levels=7
 level0=[
 [{x:1, y:1}, [10,0]],
 [{x:7, y:7}, [11,0,256]],
@@ -77,8 +77,26 @@ level5=[
 [{x:1, y:1}, [10,0]],
 [{x:1, y:2}, [10,0]],
 [{x:4, y:4}, [11,0,128]],
-[{x:7, y:7}, [11,0,128]],
-[{x:2, y:8}, [11,0,128]],
+[{x:7, y:7}, [11,0,64]],
+[{x:2, y:8}, [11,0,192]],
+[{x:4, y:6}, [11,0,128]],
+]
+level6=[
+[{x:0, y:1}, [10,0]],
+[{x:9, y:1}, [10,2]],
+[{x:4, y:4}, [11,0,128]],
+[{x:7, y:7}, [11,0,64]],
+[{x:2, y:8}, [11,0,192]],
+[{x:4, y:6}, [11,0,128]],
+]
+level7=[
+[{x:4, y:4}, [10,1]],
+[{x:5, y:4}, [10,0]],
+[{x:4, y:5}, [10,2]],
+[{x:5, y:5}, [10,3]],
+[{x:7, y:7}, [11,0,64]],
+[{x:2, y:8}, [11,0,192]],
+[{x:4, y:6}, [11,0,128]],
 ]
 
 //Mobile detection
@@ -432,15 +450,21 @@ function draw_laser_path(start)
   }
   if(start[1][1]==1)
   {
-    draw_line(ic.x, ic.y-20, ic.x+100, ic.y+120)
+    draw_line(ic.x, ic.y-20, ic.x, ic.y-100)
+    next={x:start[0].x, y: start[0].y-1}
+    from=3
   }
   if(start[1][1]==2)
   {
     draw_line(ic.x-20, ic.y, ic.x-100, ic.y)
+    next={x:start[0].x-1, y: start[0].y}
+    from=2
   }
   if(start[1][1]==3)
   {
     draw_line(ic.x, ic.y+20, ic.x, ic.y+100)
+    next={x:start[0].x, y: start[0].y+1}
+    from=1
   }
   ctx.lineWidth=1
   follow_laser(next, from)
@@ -1020,5 +1044,5 @@ function dragmove(e)
 
 }
 
-load_level(5)
+load_level(7)
 ani=setInterval(main_loop, interval);
