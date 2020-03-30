@@ -41,6 +41,7 @@ dragging_piece=0
 dragging_flipped=0
 laseron=0
 current_level=0
+filter_default_value=128
 
 //
 
@@ -99,9 +100,8 @@ function loader()
 
 //Auxiliary functions
 
-function draw_line(x1,y1,x2,y2,colour="white")
+function draw_line(x1,y1,x2,y2)
 {
-  ctx.strokeStyle=colour;
   ctx.beginPath();
   ctx.moveTo(x1,y1);
   ctx.lineTo(x2,y2);
@@ -167,9 +167,13 @@ function draw_splitter(coords,rot=0)
   ctx.lineWidth=1
 }
 
-function draw_filter(coords)
+function draw_filter(coords,fv=128)
 {
-
+    ctx.lineWidth=2
+    c={x:coord_to_pixel(coords.x), y:coord_to_pixel(coords.y)}
+    ctx.strokeRect(c.x-20,c.y-20,40,40)
+    ctx.font="20px sans-serif"
+    ctx.fillText(fv,c.x-20,c.y)
 }
 
 // 0-right, 1-down, 2-left, 3-up
@@ -209,16 +213,26 @@ function draw_laser(coords, or=0)
   ctx.lineWidth=1
 }
 
-function draw_target(coords)
+function draw_target(coords, nd)
 {
   c={x:coord_to_pixel(coords.x), y:coord_to_pixel(coords.y)}
+  var pw=power_grid[coords.y][coords.x]
   ctx.lineWidth=2
   draw_circle(c.x,c.y,20)
-  ctx.lineWidth=1
+
+  ctx.font="15px sans-serif"
+  ctx.textAlign="center"
+  ctx.fillText(Math.round(pw)+"/"+nd,c.x,c.y-25)
+  ctx.textAlign="start"
+
+  //progress bar
+  ctx.beginPath();
+  ctx.strokeStyle="green"
+  ctx.lineWidth=4
+  ctx.arc(c.x, c.y, 20, -Math.PI/2, (2*Math.PI*pw/nd)-(Math.PI/2));
+  ctx.strokeStyle="white"
+  ctx.stroke()
 }
-
-function draw_filter2(){}
-
 
 function pixel_to_coord(px)
 {
@@ -254,7 +268,7 @@ function draw_grid()
   draw_line(0,1000,1000,1000)
   draw_mirror({x:1,y:10})
   draw_splitter({x:2,y:10})
-  draw_filter({x:3,y:10})
+  draw_filter({x:3,y:10},filter_default_value)
 
   ctx.strokeRect(10,1010,80,80)
   if(laseron==0)
@@ -291,17 +305,21 @@ function draw_game()
       {
         draw_splitter({x:i,y:j},ci[1])
       }
+      if(ci[0]==3)
+      {
+        draw_filter({x:i,y:j},ci[1])
+      }
       if(ci[0]==10)
       {
         draw_laser({x:i,y:j},ci[1])
       }
       if(ci[0]==11)
       {
-        draw_target({x:i,y:j},ci[1])
+        draw_target({x:i,y:j},ci[2])
       }
-
     }
   }
+  ctx.strokeStyle="rgb(255,128,0)"
   if(dragging_piece==1)
   {
     draw_mirror({x:mouse_coords.x, y: mouse_coords.y},dragging_flipped)
@@ -310,6 +328,11 @@ function draw_game()
   {
     draw_splitter({x:mouse_coords.x, y: mouse_coords.y},dragging_flipped)
   }
+  else if(dragging_piece==3)
+  {
+    draw_filter({x:mouse_coords.x, y: mouse_coords.y},dragging_flipped)
+  }
+  ctx.strokeStyle="white"
 
   //Draw laser path
   if(laseron==1)
@@ -341,6 +364,7 @@ function draw_progress()
   ctx.lineWidth=4
   ctx.arc(950, 1050, 30, -Math.PI/2, (2*Math.PI*supplied/need)-(Math.PI/2));
   ctx.stroke()
+  ctx.strokeStyle="white"
 }
 
 // 0-right, 1-down, 2-left, 3-up
@@ -350,26 +374,28 @@ function draw_laser_path(start)
   ic={x: coord_to_pixel(start[0].x), y: coord_to_pixel(start[0].y)}
   next=[]
   ctx.lineWidth=3
+  ctx.strokeStyle="red"
   if(start[1][1]==0)
   {
-    draw_line(ic.x+20, ic.y, ic.x+100, ic.y, "rgb(255,0,0)")
+    draw_line(ic.x+20, ic.y, ic.x+100, ic.y)
     next={x:start[0].x+1, y: start[0].y}
     from=0
   }
   if(start[1][1]==1)
   {
-    draw_line(ic.x, ic.y-20, ic.x+100, ic.y+120, "rgb(255,0,0)")
+    draw_line(ic.x, ic.y-20, ic.x+100, ic.y+120)
   }
   if(start[1][1]==2)
   {
-    draw_line(ic.x-20, ic.y, ic.x-100, ic.y, "rgb(255,0,0)")
+    draw_line(ic.x-20, ic.y, ic.x-100, ic.y)
   }
   if(start[1][1]==3)
   {
-    draw_line(ic.x, ic.y+20, ic.x, ic.y+100, "rgb(255,0,0)")
+    draw_line(ic.x, ic.y+20, ic.x, ic.y+100)
   }
   ctx.lineWidth=1
   follow_laser(next, from)
+  ctx.strokeStyle="white"
 }
 
 // 0-from left, 1-from up, 2-from right, 3-from down
@@ -387,7 +413,7 @@ function follow_laser(coords,ori,str=255)
   //ray from left side
   if(ori==0)
   {
-    if(board[coords.y][coords.x][0]==0) {nextr=nextr.concat([[0,{x:+1, y:0},1]])}//nothing
+    if(board[coords.y][coords.x][0]==0 || board[coords.y][coords.x][0]==3) {nextr=nextr.concat([[0,{x:+1, y:0},1]])}//nothing, filter
     if(board[coords.y][coords.x][0]==1)//reflector
     {
       if(board[coords.y][coords.x][1]==0) {nextr=nextr.concat([[1,{x:0, y:+1},1]])}//Normal
@@ -401,7 +427,7 @@ function follow_laser(coords,ori,str=255)
   }
   if(ori==1)//ray from top
   {
-    if(board[coords.y][coords.x][0]==0) {nextr=nextr.concat([[1,{x:0, y:+1},1]])}//nothing
+    if(board[coords.y][coords.x][0]==0 || board[coords.y][coords.x][0]==3) {nextr=nextr.concat([[1,{x:0, y:+1},1]])}//nothing, filter
     if(board[coords.y][coords.x][0]==1)//reflector
     {
       if(board[coords.y][coords.x][1]==0) {nextr=nextr.concat([[0,{x:+1, y:0},1]])} //Normal
@@ -415,7 +441,7 @@ function follow_laser(coords,ori,str=255)
   }
   if(ori==2)//ray from right side
   {
-    if(board[coords.y][coords.x][0]==0) {nextr=nextr.concat([[2,{x:-1, y:0},1]])}//nothing
+    if(board[coords.y][coords.x][0]==0 || board[coords.y][coords.x][0]==3) {nextr=nextr.concat([[2,{x:-1, y:0},1]])}//nothing, filter
     if(board[coords.y][coords.x][0]==1)//reflector
     {
       if(board[coords.y][coords.x][1]==0) {nextr=nextr.concat([[3,{x:0, y:-1},1]])}//Normal
@@ -429,7 +455,7 @@ function follow_laser(coords,ori,str=255)
   }
   if(ori==3)//ray from bottom
   {
-    if(board[coords.y][coords.x][0]==0) {nextr=nextr.concat([[3,{x:0, y:-1},1]])}//nothing
+    if(board[coords.y][coords.x][0]==0 || board[coords.y][coords.x][0]==3) {nextr=nextr.concat([[3,{x:0, y:-1},1]])}//nothing, filter
     if(board[coords.y][coords.x][0]==1)//reflector
     {
       if(board[coords.y][coords.x][1]==0) {nextr=nextr.concat([[2,{x:-1, y:0},1]])}//Normal
@@ -443,19 +469,33 @@ function follow_laser(coords,ori,str=255)
   }
   for(var i=0; i<nextr.length; i++)
   {
+
     var it=nextr[i]
     var next={x:coords.x+it[1].x, y:coords.y+it[1].y}
+
+
+    if(board[coords.y][coords.x][0]==3 && fstr>board[coords.y][coords.x][1])//filter processing
+    {
+      fstr=board[coords.y][coords.x][1]
+    }
+    else
+    {
+      fstr=str/it[2]
+    }
+    console.log(fstr)
+
     ctx.lineWidth=3
+    ctx.strokeStyle="rgb("+fstr+",0,0)"
     if(coords.y<9)
     {
-      draw_line(linestart.x, linestart.y, linestart.x+(it[1].x*100), linestart.y+(it[1].y*100), "rgb("+(str/it[2])+",0,0)")
+      draw_line(linestart.x, linestart.y, linestart.x+(it[1].x*100), linestart.y+(it[1].y*100))
     }
     else if(coords.y==9)
     {
-      draw_line(linestart.x, linestart.y, linestart.x+(it[1].x*50), linestart.y+(it[1].y*50), "rgb("+(str/it[2])+",0,0)")
+      draw_line(linestart.x, linestart.y, linestart.x+(it[1].x*50), linestart.y+(it[1].y*50))
     }
     ctx.lineWidth=1
-    follow_laser(next, it[0], str/it[2])
+    follow_laser(next, it[0], fstr)
   }
 }
 
@@ -826,17 +866,19 @@ function mousedown(e)
   {
     if(mouse_coords.y==10)
     {
-      if(mouse_coords.x>0 && mouse_coords.x<3)
+      if(mouse_coords.x>0 && mouse_coords.x<4) //component
       {
         dragging_piece=mouse_coords.x
+        dragging_flipped=0
         dragging=1
+        if(mouse_coords.x==3){dragging_flipped=filter_default_value}
       }
-      else if(mouse_coords.x==0)
+      else if(mouse_coords.x==0) //on/off switch
       {
         laseron^=1
         if(laseron==0){reset_pgrid()}
       }
-      else if(mouse_coords.x==8)
+      else if(mouse_coords.x==8) //Reset button
       {
         load_level(current_level)
       }
@@ -853,7 +895,25 @@ function mousedown(e)
   {
     if(mouse_coords.y<10 && board[mouse_coords.y][mouse_coords.x][0]<10)
     {
-      board[mouse_coords.y][mouse_coords.x][1]^=1
+      if(board[mouse_coords.y][mouse_coords.x][0]==3)
+      {
+        if(board[mouse_coords.y][mouse_coords.x][1]==8)
+        {
+          board[mouse_coords.y][mouse_coords.x][1]=128
+        }
+        else
+        {
+          board[mouse_coords.y][mouse_coords.x][1]/=2
+        }
+      }
+      else
+      {
+        board[mouse_coords.y][mouse_coords.x][1]^=1
+      }
+    }
+    if(mouse_coords.y==10 && mouse_coords.x==3){
+      if(filter_default_value==8){filter_default_value=128}
+      else{filter_default_value/=2}
     }
   }
   //middle click, delete
@@ -888,13 +948,21 @@ function mouseup(e)
 
 function dragmove(e)
 {
+  ctx.strokeStyle="rgb(255,128,0)"
   switch(dragging_piece)
   {
     case 1:
       draw_mirror(mouse_coords, dragging_flipped)
+      break
     case 2: 
       draw_splitter(mouse_coords, dragging_flipped)
+      break
+    case 3: 
+      draw_filter(mouse_coords, dragging_flipped)
+      break
   }
+  ctx.strokeStyle="white"
+
 }
 
 load_level(1)
