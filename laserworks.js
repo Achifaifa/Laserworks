@@ -46,11 +46,10 @@ filter_default_value=128
 
 board=[]
 power_grid=[]
-turn=0
 
 // Level data
 current_level=0
-total_levels=9
+total_levels=10
 level0=[
 [{x:1, y:1}, [10,0]],
 [{x:7, y:7}, [11,0,256]],
@@ -371,8 +370,6 @@ function draw_grid()
   ctx.textAlign="start"
 }
 
-
-
 function draw_game()
 {
   draw_grid();
@@ -609,7 +606,6 @@ function follow_laser(coords,ori,str=256)
   }
 }
 
-
 //Intro and menus
 
 function logo_animation(i)
@@ -619,7 +615,7 @@ function logo_animation(i)
   ctx.fillStyle="rgba(255,255,255,"+(anistep/80)+")";
   ctx.textAlign="center"
   ctx.fillText("愛智重工",500,500);
-  ctx.font="20px quizma-light";
+  ctx.font="20px quizma";
   ctx.fillText("Achi Heavy Industries",500,520)
   if (anistep==80){clearTimeout(ani);ani=setInterval(logo_animation, interval, 0)}
   if(i==1){anistep++;}else{anistep--;}
@@ -629,10 +625,10 @@ function logo_animation(i)
 function title_animation(i)
 {
   ctx.clearRect(0,0,1000,1000)
-  ctx.font="120px quizma-light";
+  ctx.font="100px spaceage";
   ctx.fillStyle="rgba(255,255,255,"+(anistep/80)+")";
   ctx.textAlign="center"
-  ctx.fillText("Xi",500,500);
+  ctx.fillText("Laserworks",500,500);
   if (anistep==80)
   {
     clearTimeout(ani);
@@ -646,30 +642,47 @@ function title_animation(i)
 function menu()
 {
   ctx.canvas.removeEventListener("click", skip_to_menu);
-  ctx.clearRect(0,0,1000,1000)
+  ctx.clearRect(0,0,1000,1100)
   malpha=anistep/30;
   ctx.lineWidth=1;
-  draw_line(80,120,80,880, "white", malpha);
-  draw_line(80,120,100,120, "white", malpha);
 
   ctx.fillStyle="rgba(255,255,255,"+malpha+")";
-  ctx.textAlign="start";
+  ctx.textAlign="center";
+  ctx.font="100px spaceage";
+  ctx.fillText("Laserworks",500,160);
 
-  ctx.font="120px quizma-light";
-  ctx.fillText("Xi",125,160);
-  ctx.font="20px quizma-light";
-  ctx.fillText(version,210,160);
-  ctx.font="bold 50px quizma-light";
-  ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(200))+")";
-  ctx.fillText("New game",150,260);
-  ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(300))+")";
-  ctx.fillText("Play vs AI",150,360);
-  ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(400))+")";
-  ctx.fillText("Tutorial",150,460);
-  ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(600))+")";
-  ctx.fillText("Settings",150,660);
-  ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(700))+")";
-  ctx.fillText("Credits",150,760);
+  ctx.font="bold 50px quizma";
+  ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(350))+")";
+  ctx.fillText("New game",500,360);
+  ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(450))+")";
+  ctx.fillText("Level select",500,460);
+  ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(550))+")";
+  ctx.fillText("Tutorial",500,560);
+  ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(750))+")";
+  ctx.fillText("Settings",500,760);
+  ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(850))+")";
+  ctx.fillText("Credits",500,860);
+
+  if (anistep<30){anistep++;} 
+}
+
+function level_select()
+{
+  ctx.clearRect(0,0,1000,1000)
+  var malpha=anistep/30;
+  ctx.lineWidth=1;
+
+  ctx.fillStyle="rgba(255,255,255,"+malpha+")";
+  ctx.textAlign="center";
+  ctx.font="100px spaceage";
+  ctx.fillText("Laserworks",500,160);
+  ctx.textAlign="end"
+  ctx.font="60px quizma";
+  ctx.fillText("Levels",950,200);
+
+  ctx.textAlign="center"
+  ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(850))+")";
+  ctx.fillText("Back",500,860);
 
   if (anistep<30){anistep++;} 
 }
@@ -679,34 +692,33 @@ function credits()
   ctx.clearRect(0,0,1000,1000)
 
   calpha=anistep/30
-  draw_line(80,120,80,880, "white", calpha);
-  draw_line(80,120,100,120, "white", calpha);
-  draw_line(250,120,275,120, "white", calpha);
 
   ctx.fillStyle="rgba(255,255,255,"+calpha+")";
-  ctx.textAlign="start";
+  ctx.textAlign="center";
+  ctx.font="100px spaceage";
+  ctx.fillText("laserworks",500,160);
+  ctx.textAlign="end"
+  ctx.font="60px quizma";
+  ctx.fillText("Credits",950,200);
 
-  ctx.font="120px quizma-light";
-  ctx.fillText("Xi",125,160);
-  ctx.font="75px quizma-light";
-  ctx.fillText("Credits",300,145);
-  ctx.font="20px quizma-light";
-  ctx.fillText(version,210,160);
+  ctx.textAlign="center"
+  ctx.font="bold 50px quizma";
+  ctx.fillText("Code",350,260);
+  ctx.fillText("Music",750,460);
+  ctx.fillText("SFX",250,460);
+  ctx.fillText("Fonts",350,660);
+  ctx.fillStyle="rgba(255,255,255,"+(30*calpha/menu_alpha(850))+")";
+  ctx.fillText("Back",500,860);
 
-  ctx.font="bold 50px quizma-light";
-  ctx.fillText("Code",150,260);
-  ctx.fillText("SFX",150,360);
-  ctx.fillText("Font",150,460);
-  ctx.fillStyle="rgba(255,255,255,"+(30*calpha/menu_alpha(700))+")";
-  ctx.fillText("Back",150,760);
-
-  ctx.font="45px quizma-light";
-  ctx.fillStyle="rgba(255,255,255,"+(30*calpha/menu_alpha(200))+")";
+  ctx.font="45px quizma";
+  ctx.fillStyle="rgba(255,255,255,"+(30*calpha/menu_alpha(250))+")";
   ctx.fillText("Achifaifa",350,260);
-  ctx.fillStyle="rgba(255,255,255,"+(30*calpha/menu_alpha(300))+")";
+  ctx.fillStyle="rgba(255,255,255,"+(30*calpha/menu_alpha(350))+")";
   ctx.fillText("broumbroum",350,360);
-  ctx.fillStyle="rgba(255,255,255,"+(50*calpha/menu_alpha(400))+")";
+  ctx.fillStyle="rgba(255,255,255,"+(50*calpha/menu_alpha(450))+")";
   ctx.fillText("Studio Typo",350,460);
+  ctx.fillStyle="rgba(255,255,255,"+(50*calpha/menu_alpha(550))+")";
+  ctx.fillText("Justin Callaghan",350,560);//https://fonts.webtoolhub.com/font-n29145-space-age.aspx?lic=1
 
   if (anistep<30){anistep++}
 }
@@ -723,13 +735,13 @@ function settings()
   ctx.fillStyle="rgba(255,255,255,"+salpha+")";
   ctx.textAlign="start";
 
-  ctx.font="120px quizma-light";
+  ctx.font="120px quizma";
   ctx.fillText("Xi",125,160);
-  ctx.font="75px quizma-light";
+  ctx.font="75px quizma";
   ctx.fillText("Settings",300,145);
-  ctx.font="20px quizma-light";
+  ctx.font="20px quizma";
   ctx.fillText(version,210,160);
-  ctx.font="bold 50px quizma-light";
+  ctx.font="bold 50px quizma";
 
   ctx.fillStyle="rgba(255,255,255,"+(30*salpha/menu_alpha(200))+")";
   ctx.fillText("Grid",150,260);
@@ -744,7 +756,7 @@ function settings()
   ctx.fillStyle="rgba(255,255,255,"+(30*salpha/menu_alpha(700))+")";
   ctx.fillText("Back",150,760);
 
-  ctx.font="45px quizma-light";
+  ctx.font="45px quizma";
   ctx.fillStyle="rgba(255,255,255,"+salpha+")";
   ctx.fillText(grid_types[grid],350,260);
   ctx.fillText(flip_types[flip],350,360);
@@ -780,12 +792,12 @@ function skip_to_menu(e,mute=0)
 
 function update_menu_option()
 {
-       if(mouse_pos.y>220 && mouse_pos.y<270){menu_option=1;}
-  else if(mouse_pos.y>320 && mouse_pos.y<370){menu_option=2;}
-  else if(mouse_pos.y>420 && mouse_pos.y<470){menu_option=3;}
-  else if(mouse_pos.y>520 && mouse_pos.y<570){menu_option=4;}
-  else if(mouse_pos.y>620 && mouse_pos.y<670){menu_option=5;}
-  else if(mouse_pos.y>720 && mouse_pos.y<770){menu_option=6;}
+       if(mouse_pos.y>320 && mouse_pos.y<370){menu_option=1;}
+  else if(mouse_pos.y>420 && mouse_pos.y<470){menu_option=2;}
+  else if(mouse_pos.y>520 && mouse_pos.y<570){menu_option=3;}
+  else if(mouse_pos.y>620 && mouse_pos.y<670){menu_option=4;}
+  else if(mouse_pos.y>720 && mouse_pos.y<770){menu_option=5;}
+  else if(mouse_pos.y>820 && mouse_pos.y<870){menu_option=6;}
   else {menu_option=-1}
 }
 
@@ -799,45 +811,65 @@ function update_click_coords()
 
 function main_menu_listener()
 {  
-  valid_options=[1,2,3,5,6]
+  valid_options=[1,2]
 
   if (valid_options.includes(menu_option))
   {
     ctx.canvas.removeEventListener("click", main_menu_listener, false);
     anistep=1;
     clearTimeout(ani);
+    if (menu_option==1) 
+    {
+      load_level(0)
+      au.play("menu_select")
+      //ctx.canvas.addEventListener("click", main_game_listener, false);
+      ctx.canvas.addEventListener("mousedown", mousedown);
+      ctx.canvas.addEventListener("mouseup", mouseup);
+      ctx.canvas.addEventListener("mousemove", dragmove);
+      ani=setInterval(main_loop, interval, false);
+    }
+    if (menu_option==2){
+      au.play("menu_select")
+      initialize_board();
+      ai=1
+      ctx.canvas.addEventListener("click", levels_listener, false);
+      ani=setInterval(level_select, interval, false);
+    }
+      if (menu_option==3){
+      au.play("menu_select")
+      ctx.canvas.addEventListener("click", tutorial_listener, false);
+      ani=setInterval(tutorial, interval, false);
+    }
+    if (menu_option==5)
+    {
+      au.play("menu_select")
+      ani=setInterval(settings, interval, 1);
+      ctx.canvas.addEventListener("click", settings_menu_listener, false);
+    }
+    if (menu_option==6)
+    {
+      au.play("menu_select")
+      ani=setInterval(credits, interval, 1);
+      ctx.canvas.addEventListener("click", credits_menu_listener, false);
+    }
   }
-  if (menu_option==1) 
+}
+
+function levels_listener()
+{
+  valid_options=[7]
+  if (valid_options.includes(menu_option))
   {
-    au.play("menu_select")
-    initialize_board();
-    ctx.canvas.addEventListener("click", main_game_listener, false);
-    ani=setInterval(main_loop, interval, false);
-  }
-  if (menu_option==2){
-    au.play("menu_select")
-    initialize_board();
-    ai=1
-    ctx.canvas.addEventListener("click", main_game_listener, false);
-    ani=setInterval(main_loop, interval, false);
-  }
-    if (menu_option==3){
-    au.play("menu_select")
-    ctx.canvas.addEventListener("click", tutorial_listener, false);
-    ani=setInterval(tutorial, interval, false);
-  }
-  if (menu_option==5)
-  {
-    au.play("menu_select")
-    ani=setInterval(settings, interval, 1);
-    ctx.canvas.addEventListener("click", settings_menu_listener, false);
+    ctx.canvas.removeEventListener("click", main_menu_listener, false);
+    anistep=1;
+    clearTimeout(ani);
   }
   if (menu_option==6)
   {
-    au.play("menu_select")
-    ani=setInterval(credits, interval, 1);
-    ctx.canvas.addEventListener("click", credits_menu_listener, false);
-  }
+    au.play("menu_back")
+    ctx.canvas.removeEventListener("click", levels_listener, false);
+    skip_to_menu(1,1)
+  } 
 }
 
 function settings_menu_listener()
@@ -956,18 +988,6 @@ function mouse_position(c, e) {
   };
 }
 
-ctx.canvas.addEventListener("click", update_menu_option);
-ctx.canvas.addEventListener('mousemove', function(e){
-  mouse_pos=mouse_position(ctx.canvas, e);
-  mouse_coords={x: pixel_to_coord(mouse_pos.x), y: pixel_to_coord(mouse_pos.y)}
-}, false);
-
-//drag/drop listener
-ctx.canvas.addEventListener("mousedown", mousedown);
-ctx.canvas.addEventListener("mouseup", mouseup);
-ctx.canvas.addEventListener("mousemove", dragmove);
-
-
 function mousedown(e)
 {
   reset_pgrid()
@@ -993,7 +1013,6 @@ function mousedown(e)
         current_level+=1
         current_level=current_level%total_levels
         load_level(current_level)
-        console.log(current_level)
       }
       else if(mouse_coords.x==8) //Reset button
       {
@@ -1037,11 +1056,19 @@ function mousedown(e)
       }
       if(mouse_coords.x==8)
       {
-        console.log("Quit to menu")
+        anistep=1;
+        clearTimeout(ani);
+        ctx.canvas.removeEventListener("mousedown", mousedown);
+        ctx.canvas.removeEventListener("mouseup", mouseup);
+        ctx.canvas.removeEventListener("mousemove", dragmove);
+        ctx.canvas.addEventListener("click", main_menu_listener)
+        ani=setInterval(menu, interval, false);
       }
       if(mouse_coords.x==7)
       {
-        console.log("level back")
+        current_level+=total_levels-1
+        current_level=current_level%total_levels
+        load_level(current_level)
       }
     } 
   }
@@ -1091,8 +1118,16 @@ function dragmove(e)
       break
   }
   ctx.strokeStyle="white"
-
 }
 
-load_level(9)
-ani=setInterval(main_loop, interval);
+ctx.canvas.addEventListener("click", update_menu_option);
+ctx.canvas.addEventListener('mousemove', function(e){
+  mouse_pos=mouse_position(ctx.canvas, e);
+  mouse_coords={x: pixel_to_coord(mouse_pos.x), y: pixel_to_coord(mouse_pos.y)}
+}, false);
+
+//Main listener
+
+ctx.canvas.addEventListener("click", skip_to_menu);
+loader()
+ani=setInterval(logo_animation, interval, 1);
