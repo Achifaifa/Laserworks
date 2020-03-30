@@ -50,7 +50,7 @@ turn=0
 
 // Level data
 current_level=0
-total_levels=5
+total_levels=6
 level0=[
 [{x:1, y:1}, [10,0]],
 [{x:7, y:7}, [11,0,256]],
@@ -379,7 +379,13 @@ function draw_game()
   {
     reset_pgrid()
     lvd=eval("level"+current_level)
-    draw_laser_path(lvd[0])
+    for(i=0; i<lvd.length; i++)
+    {
+      if(lvd[i][1][0]==10)
+      {
+        draw_laser_path(lvd[i])
+      }
+    }
   }
 
   draw_progress()
@@ -1014,5 +1020,5 @@ function dragmove(e)
 
 }
 
-load_level(0)
+load_level(5)
 ani=setInterval(main_loop, interval);
