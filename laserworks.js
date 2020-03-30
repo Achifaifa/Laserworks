@@ -94,8 +94,8 @@ level7=[
 [{x:5, y:4}, [10,0]],
 [{x:4, y:5}, [10,2]],
 [{x:5, y:5}, [10,3]],
-[{x:7, y:7}, [11,0,64]],
-[{x:2, y:8}, [11,0,192]],
+[{x:7, y:7}, [11,0,276]],
+[{x:2, y:8}, [11,0,208]],
 [{x:4, y:6}, [11,0,128]],
 ]
 
@@ -558,13 +558,13 @@ function follow_laser(coords,ori,str=256)
 
     ctx.lineWidth=3
     ctx.strokeStyle="rgb("+fstr+",0,0)"
-    if(coords.y<9)
+    if(coords.y==9 && ori==1)
+    {
+      draw_line(linestart.x, linestart.y, linestart.x+(it[1].x*100), linestart.y+(it[1].y*50))
+    }
+    else
     {
       draw_line(linestart.x, linestart.y, linestart.x+(it[1].x*100), linestart.y+(it[1].y*100))
-    }
-    else if(coords.y==9)
-    {
-      draw_line(linestart.x, linestart.y, linestart.x+(it[1].x*50), linestart.y+(it[1].y*50))
     }
     ctx.lineWidth=1
     follow_laser(next, it[0], fstr)
