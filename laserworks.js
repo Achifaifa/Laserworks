@@ -338,12 +338,16 @@ function draw_grid()
   }
 
   //reset button
-  ctx.textAlign="center"
+  ctx.textAlign="start"
   ctx.strokeRect(810,1010,80,80)
-  ctx.font="30px sans-serif"
-  ctx.fillText("RST",850,1060)
+  draw_line(890,1010,810,1090)
+  ctx.font="25px sans-serif"
+  ctx.fillText("RST",815,1035)
+  ctx.textAlign="end"
+  ctx.fillText("ESC",885,1085)
 
   //level load
+  ctx.textAlign="center"
   ctx.strokeRect(710,1010,80,80)
   ctx.fillText(current_level,750,1070)
   ctx.font="20px sans-serif"
@@ -1009,10 +1013,22 @@ function mousedown(e)
         board[mouse_coords.y][mouse_coords.x][1]^=1
       }
     }
-    if(mouse_coords.y==10 && mouse_coords.x==3){
-      if(filter_default_value==8){filter_default_value=128}
-      else{filter_default_value/=2}
-    }
+    if(mouse_coords.y==10)
+    {
+      if(mouse_coords.x==3)
+      {
+        if(filter_default_value==8){filter_default_value=128}
+        else{filter_default_value/=2}
+      }
+      if(mouse_coords.x==8)
+      {
+        console.log("Quit to menu")
+      }
+      if(mouse_coords.x==7)
+      {
+        console.log("level back")
+      }
+    } 
   }
   //middle click, delete
   else if(e.buttons==4)
