@@ -40,7 +40,6 @@ selected={x:-1, y:-1}
 dragging_piece=0
 dragging_flipped=0
 laseron=0
-current_level=0
 filter_default_value=128
 
 //
@@ -50,10 +49,36 @@ power_grid=[]
 turn=0
 
 // Level data
-
+current_level=0
+total_levels=5
+level0=[
+[{x:1, y:1}, [10,0]],
+[{x:7, y:7}, [11,0,256]],
+]
 level1=[
 [{x:1, y:1}, [10,0]],
-[{x:7, y:7}, [11,0,255]],
+[{x:7, y:7}, [11,0,128]],
+]
+level2=[
+[{x:1, y:1}, [10,0]],
+[{x:7, y:7}, [11,0,100]],
+]
+level3=[
+[{x:1, y:1}, [10,0]],
+[{x:4, y:4}, [11,0,128]],
+[{x:7, y:7}, [11,0,128]],
+]
+level4=[
+[{x:1, y:1}, [10,0]],
+[{x:4, y:4}, [11,0,64]],
+[{x:7, y:7}, [11,0,4]],
+]
+level5=[
+[{x:1, y:1}, [10,0]],
+[{x:1, y:2}, [10,0]],
+[{x:4, y:4}, [11,0,128]],
+[{x:7, y:7}, [11,0,128]],
+[{x:2, y:8}, [11,0,128]],
 ]
 
 //Mobile detection
@@ -228,10 +253,16 @@ function draw_target(coords, nd)
   //progress bar
   ctx.beginPath();
   ctx.strokeStyle="green"
-  ctx.lineWidth=4
+  ctx.lineWidth=6
   ctx.arc(c.x, c.y, 20, -Math.PI/2, (2*Math.PI*pw/nd)-(Math.PI/2));
-  ctx.strokeStyle="white"
   ctx.stroke()
+  ctx.strokeStyle="white"
+
+  //overload
+  if(pw>nd)
+  {
+    //TO-DO
+  }
 }
 
 function pixel_to_coord(px)
@@ -281,9 +312,18 @@ function draw_grid()
   }
 
   //reset button
+  ctx.textAlign="center"
   ctx.strokeRect(810,1010,80,80)
   ctx.font="30px sans-serif"
-  ctx.fillText("RST",820,1060)
+  ctx.fillText("RST",850,1060)
+
+  //level load
+  ctx.strokeRect(710,1010,80,80)
+  ctx.fillText(current_level,750,1070)
+  ctx.font="20px sans-serif"
+  ctx.fillText("LEVEL",750,1040)
+
+  ctx.textAlign="start"
 }
 
 
@@ -348,10 +388,10 @@ function draw_game()
 function draw_progress()
 {
   lvd=eval("level"+current_level)
+  var need=0
+  var supplied=0
   for(i=0; i<lvd.length; i++)
   {
-    var need=0
-    var supplied=0
     if(lvd[i][1].length==3)//Process targets
     {
       need+=lvd[i][1][2]
@@ -365,6 +405,9 @@ function draw_progress()
   ctx.arc(950, 1050, 30, -Math.PI/2, (2*Math.PI*supplied/need)-(Math.PI/2));
   ctx.stroke()
   ctx.strokeStyle="white"
+  ctx.textAlign="center"
+  ctx.fillText(parseInt(supplied)+"/"+need,950,1055)
+  ctx.textAlign="start"
 }
 
 // 0-right, 1-down, 2-left, 3-up
@@ -399,7 +442,7 @@ function draw_laser_path(start)
 }
 
 // 0-from left, 1-from up, 2-from right, 3-from down
-function follow_laser(coords,ori,str=255)
+function follow_laser(coords,ori,str=256)
 {
   if (coords.x<0 || coords.x>9 || coords.y<0 || coords.y>9){return 0}
     power_grid[coords.y][coords.x]+=str
@@ -482,7 +525,6 @@ function follow_laser(coords,ori,str=255)
     {
       fstr=str/it[2]
     }
-    console.log(fstr)
 
     ctx.lineWidth=3
     ctx.strokeStyle="rgb("+fstr+",0,0)"
@@ -878,6 +920,13 @@ function mousedown(e)
         laseron^=1
         if(laseron==0){reset_pgrid()}
       }
+      else if(mouse_coords.x==7) //Level select
+      {
+        current_level+=1
+        current_level=current_level%total_levels
+        load_level(current_level)
+        console.log(current_level)
+      }
       else if(mouse_coords.x==8) //Reset button
       {
         load_level(current_level)
@@ -965,5 +1014,5 @@ function dragmove(e)
 
 }
 
-load_level(1)
+load_level(0)
 ani=setInterval(main_loop, interval);
