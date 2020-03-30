@@ -314,6 +314,7 @@ function draw_game()
   //Draw laser path
   if(laseron==1)
   {
+    reset_pgrid()
     lvd=eval("level"+current_level)
     draw_laser_path(lvd[0])
   }
@@ -375,7 +376,7 @@ function draw_laser_path(start)
 function follow_laser(coords,ori,str=255)
 {
   if (coords.x<0 || coords.x>9 || coords.y<0 || coords.y>9){return 0}
-    power_grid[coords.y][coords.x]=str
+    power_grid[coords.y][coords.x]+=str
   if (board[coords.y][coords.x][0]>9){return 0}
 
   
@@ -819,6 +820,7 @@ ctx.canvas.addEventListener("mousemove", dragmove);
 
 function mousedown(e)
 {
+  reset_pgrid()
   //left click, drag
   if(e.buttons==1)
   {
