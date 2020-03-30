@@ -277,9 +277,17 @@ function draw_target(coords, nd)
   ctx.strokeStyle="white"
 
   //overload
+
   if(pw>nd)
   {
-    //TO-DO
+    var unit=2*Math.PI/nd
+    ctx.beginPath();
+    ctx.strokeStyle="red"
+    ctx.lineWidth=6
+    ctx.arc(c.x, c.y, 20, -Math.PI/2, (unit*(pw-nd))-(Math.PI/2));
+    ctx.stroke()
+    ctx.strokeStyle="white"
+
   }
 }
 
@@ -432,6 +440,17 @@ function draw_progress()
   ctx.textAlign="center"
   ctx.fillText(parseInt(supplied)+"/"+need,950,1055)
   ctx.textAlign="start"
+
+  //overload bar
+  if(supplied>need)
+  {
+    ctx.beginPath();
+    ctx.strokeStyle="red"
+    ctx.lineWidth=4
+    ctx.arc(950, 1050, 30, -Math.PI/2, (2*Math.PI/need*(supplied-need))-(Math.PI/2));
+    ctx.stroke()
+    ctx.strokeStyle="white"
+  }
 }
 
 // 0-right, 1-down, 2-left, 3-up
