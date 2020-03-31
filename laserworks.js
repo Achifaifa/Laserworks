@@ -49,6 +49,7 @@ power_grid=[]
 
 // Level data
 current_level=0
+total_levels=13
 levels_completed=0
 level0=[
 [{x:1, y:1}, [10,0]],
@@ -896,6 +897,10 @@ function main_menu_listener()
       if(levels_completed>0)
       {
         inilevel=levels_completed
+        if(inilevel>=total_levels)
+        {
+          inilevel=total_levels-1
+        }
       }
       load_level(inilevel)
       au.play("menu_select")
@@ -1085,7 +1090,9 @@ function mousedown(e)
       else if(mouse_coords.x==8) //next level
       {
         var nextl=current_level+1
-        var nextl=nextl%total_levels
+        if(nextl>=total_levels){
+          nextl=current_level
+        }
         if(check_pass()==1)
         {
           levels_completed=nextl
@@ -1149,8 +1156,11 @@ function mousedown(e)
       }
       if(mouse_coords.x==8) // previous level
       {
-        var nextl=current_level+total_levels-1
-        var nextl=nextl%total_levels
+        var nextl=current_level-1
+        if(nextl<0)
+        {
+          nextl=0
+        }
         if(levels_completed-1>=nextl)
         {
           current_level=nextl
