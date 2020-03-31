@@ -862,7 +862,12 @@ function main_menu_listener()
     clearTimeout(ani);
     if (menu_option==1) 
     {
-      load_level(0)
+      var inilevel=0
+      if(levels_completed>0)
+      {
+        inilevel=levels_completed
+      }
+      load_level(inilevel)
       au.play("menu_select")
       //ctx.canvas.addEventListener("click", main_game_listener, false);
       ctx.canvas.addEventListener("mousedown", mousedown);
@@ -1053,7 +1058,7 @@ function mousedown(e)
         var nextl=nextl%total_levels
         if(check_pass()==1)
         {
-          levels_completed+=1
+          levels_completed=nextl
         }
         if(levels_completed>=nextl)
         {
