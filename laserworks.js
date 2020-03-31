@@ -39,7 +39,7 @@ menu_option=-1
 selected={x:-1, y:-1}
 dragging_piece=0
 dragging_flipped=0
-laseron=0
+laseron=1
 filter_default_value=128
 
 //
@@ -50,6 +50,7 @@ power_grid=[]
 // Level data
 current_level=0
 total_levels=10
+levels_completed=0
 level0=[
 [{x:1, y:1}, [10,0]],
 [{x:7, y:7}, [11,0,256]],
@@ -340,33 +341,38 @@ function draw_grid()
   draw_mirror({x:1,y:10})
   draw_splitter({x:2,y:10})
   draw_filter({x:3,y:10},filter_default_value)
+  ctx.fillStyle="white"
 
+  ctx.font="25px sans-serif"
   ctx.strokeRect(10,1010,80,80)
-  if(laseron==0)
-  {
-    fill_circle(50,1050,35,"green")
-  }
-  if(laseron==1)
-  {
-    fill_circle(50,1050,35,"red")
-  }
+  draw_line(90,1010,10,1090)
+  ctx.fillText("OPT", 15,1035)
+  ctx.textAlign="end"
+  ctx.fillText("SEL",85,1085)
 
   //reset button
   ctx.textAlign="start"
-  ctx.strokeRect(810,1010,80,80)
-  draw_line(890,1010,810,1090)
-  ctx.font="25px sans-serif"
-  ctx.fillText("RST",815,1035)
+  ctx.strokeRect(710,1010,80,80)
+  draw_line(790,1010,710,1090)
+  ctx.fillText("RST",715,1035)
   ctx.textAlign="end"
-  ctx.fillText("ESC",885,1085)
+  ctx.fillText("ESC",785,1085)
 
   //level load
+  if (check_pass()==1 || levels_completed-1>=current_level)
+  {
+    ctx.strokeStyle="green"
+  }
+  else
+  {
+    ctx.strokeStyle="red"
+  }
   ctx.textAlign="center"
-  ctx.strokeRect(710,1010,80,80)
-  ctx.fillText(current_level,750,1070)
+  ctx.strokeRect(810,1010,80,80)
+  ctx.fillText(current_level,850,1070)
   ctx.font="20px sans-serif"
-  ctx.fillText("LEVEL",750,1040)
-
+  ctx.fillText("LEVEL",850,1040)
+  ctx.strokeStyle="white"
   ctx.textAlign="start"
 }
 
@@ -433,9 +439,30 @@ function draw_game()
   draw_progress()
 }
 
+function check_pass()
+{
+  var lvd=eval("level"+current_level)
+  var completed=1
+  for(i=0; i<lvd.length; i++)
+  {
+    if(lvd[i][1].length==3)//Process targets
+    {
+      if (lvd[i][1][2]!=power_grid[lvd[i][0].y][lvd[i][0].x]) //Check if the target has OK levels
+      {
+        return 0
+      }
+    }
+  }
+  if(levels_completed==current_level)
+  {
+    levels_completed+=1
+  }
+  return 1
+}
+
 function draw_progress()
 {
-  lvd=eval("level"+current_level)
+  var lvd=eval("level"+current_level)
   var need=0
   var supplied=0
   for(i=0; i<lvd.length; i++)
@@ -653,7 +680,14 @@ function menu()
 
   ctx.font="bold 50px quizma";
   ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(350))+")";
-  ctx.fillText("New game",500,360);
+  if(levels_completed==0)
+  {
+    ctx.fillText("New game",500,360);
+  }
+  else
+  {
+    ctx.fillText("Continue",500,360)
+  }
   ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(450))+")";
   ctx.fillText("Level select",500,460);
   ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(550))+")";
@@ -1003,18 +1037,22 @@ function mousedown(e)
         dragging=1
         if(mouse_coords.x==3){dragging_flipped=filter_default_value}
       }
-      else if(mouse_coords.x==0) //on/off switch
+      else if(mouse_coords.x==0) //menu
       {
-        laseron^=1
-        if(laseron==0){reset_pgrid()}
+        console.log("game menu")
       }
-      else if(mouse_coords.x==7) //Level select
+      else if(mouse_coords.x==8) //next level
       {
-        current_level+=1
-        current_level=current_level%total_levels
-        load_level(current_level)
+
+        var nextl=current_level+1
+        var nextl=nextl%total_levels
+        if(levels_completed>=nextl)
+        {
+          current_level=nextl
+          load_level(current_level)
+        }
       }
-      else if(mouse_coords.x==8) //Reset button
+      else if(mouse_coords.x==7) //Reset button
       {
         load_level(current_level)
       }
@@ -1044,17 +1082,17 @@ function mousedown(e)
       }
       else
       {
-        board[mouse_coords.y][mouse_coords.x][1]^=1
+        board[mouse_coords.y][mouse_coords.x][1]^=1 //flip piece
       }
     }
     if(mouse_coords.y==10)
     {
       if(mouse_coords.x==3)
       {
-        if(filter_default_value==8){filter_default_value=128}
+        if(filter_default_value==8){filter_default_value=128}  //default filter mod
         else{filter_default_value/=2}
       }
-      if(mouse_coords.x==8)
+      if(mouse_coords.x==7)
       {
         anistep=1;
         clearTimeout(ani);
@@ -1064,11 +1102,16 @@ function mousedown(e)
         ctx.canvas.addEventListener("click", main_menu_listener)
         ani=setInterval(menu, interval, false);
       }
-      if(mouse_coords.x==7)
+      if(mouse_coords.x==8) // previous level
       {
-        current_level+=total_levels-1
-        current_level=current_level%total_levels
-        load_level(current_level)
+        var nextl=current_level+total_levels-1
+        var nextl=nextl%total_levels
+        if(levels_completed-1>=nextl)
+        {
+          current_level=nextl
+          load_level(current_level)
+        }
+        
       }
     } 
   }
