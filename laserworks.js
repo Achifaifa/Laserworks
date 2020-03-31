@@ -51,6 +51,7 @@ power_grid=[]
 current_level=0
 total_levels=13
 levels_completed=0
+score=Array(total_levels-1)
 level0=[
 [{x:1, y:1}, [10,0]],
 [{x:7, y:7}, [11,0,256]],
@@ -158,16 +159,18 @@ if(window.innerWidth>window.innerHeight)
   document.getElementById("laserworks").style.height="100%"
 }
 
-//Save game
+//Save/Load game
 
 var storedlevel=window.localStorage.getItem('maxlevel', levels_completed);
 if(storedlevel==null)
 {
   window.localStorage.setItem('maxlevel', levels_completed)
+  window.localStorage.setItem(('score'), JSON.stringify(score))
 }
 else
 {
   levels_completed=storedlevel
+  score=JSON.parse(window.localStorage.getItem('score'))
 }
 
 //Audio management
@@ -499,6 +502,19 @@ function check_pass()
   return 1
 }
 
+function calculate_score()
+{
+  var tempscore=0
+  for(i=0; i<10; i++)
+  {
+    for(j=0; j<10; j++)
+    {
+      tempscore+=board[j][i][0]
+    }
+  }
+  return tempscore
+}
+
 function draw_progress()
 {
   var lvd=eval("level"+current_level)
@@ -728,7 +744,7 @@ function menu()
     ctx.fillText("Continue",500,360)
   }
   ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(450))+")";
-  ctx.fillText("Level select",500,460);
+  ctx.fillText("Levels",500,460);
   // ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(550))+")";
   // ctx.fillText("Tutorial",500,560);
   // ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(750))+")";
@@ -752,6 +768,8 @@ function level_select()
   ctx.textAlign="end"
   ctx.font="60px quizma";
   ctx.fillText("Levels",950,200);
+
+
 
   ctx.textAlign="center"
   ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(850))+")";
@@ -1102,6 +1120,8 @@ function mousedown(e)
           current_level=nextl
           load_level(current_level)
           window.localStorage.setItem('maxlevel', levels_completed)
+          score[current_level-1]=calculate_score()
+            window.localStorage.setItem(('score'), JSON.stringify(score))
         }
       }
       else if(mouse_coords.x==7) //Reset button
