@@ -1024,7 +1024,6 @@ function mouse_position(c, e) {
 
 function mousedown(e)
 {
-  reset_pgrid()
   //left click, drag
   if(e.buttons==1)
   {
@@ -1034,7 +1033,6 @@ function mousedown(e)
       {
         dragging_piece=mouse_coords.x
         dragging_flipped=0
-        dragging=1
         if(mouse_coords.x==3){dragging_flipped=filter_default_value}
       }
       else if(mouse_coords.x==0) //menu
@@ -1043,7 +1041,6 @@ function mousedown(e)
       }
       else if(mouse_coords.x==8) //next level
       {
-
         var nextl=current_level+1
         var nextl=nextl%total_levels
         if(levels_completed>=nextl)
@@ -1134,33 +1131,29 @@ function mouseup(e)
       board[mouse_coords.y][mouse_coords.x]=[dragging_piece,dragging_flipped]
       dragging_piece=0
     }
-    else
-    {
-      dragging_piece=0
-    }
   }
-  else
-  {
-    dragging_piece=0
-  }
+  dragging_piece=0
 }
 
 function dragmove(e)
 {
-  ctx.strokeStyle="rgb(255,128,0)"
-  switch(dragging_piece)
+  if(dragging_piece!=0)
   {
-    case 1:
-      draw_mirror(mouse_coords, dragging_flipped)
-      break
-    case 2: 
-      draw_splitter(mouse_coords, dragging_flipped)
-      break
-    case 3: 
-      draw_filter(mouse_coords, dragging_flipped)
-      break
+    ctx.strokeStyle="rgb(255,128,0)"
+    switch(dragging_piece)
+    {
+      case 1:
+        draw_mirror(mouse_coords, dragging_flipped)
+        break
+      case 2: 
+        draw_splitter(mouse_coords, dragging_flipped)
+        break
+      case 3: 
+        draw_filter(mouse_coords, dragging_flipped)
+        break
+    }
+    ctx.strokeStyle="white"
   }
-  ctx.strokeStyle="white"
 }
 
 ctx.canvas.addEventListener("click", update_menu_option);
