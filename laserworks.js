@@ -360,7 +360,7 @@ function draw_grid()
   draw_line(90,1010,10,1090)
   ctx.fillText("OPT", 15,1035)
   ctx.textAlign="end"
-  ctx.fillText("SEL",85,1085)
+  ctx.fillText("---",85,1085)
 
   //reset button
   ctx.textAlign="start"
@@ -698,12 +698,12 @@ function menu()
   }
   ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(450))+")";
   ctx.fillText("Level select",500,460);
-  ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(550))+")";
-  ctx.fillText("Tutorial",500,560);
-  ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(750))+")";
-  ctx.fillText("Settings",500,760);
-  ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(850))+")";
-  ctx.fillText("Credits",500,860);
+  // ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(550))+")";
+  // ctx.fillText("Tutorial",500,560);
+  // ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(750))+")";
+  // ctx.fillText("Settings",500,760);
+  // ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(850))+")";
+  // ctx.fillText("Credits",500,860);
 
   if (anistep<30){anistep++;} 
 }
