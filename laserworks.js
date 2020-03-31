@@ -127,6 +127,18 @@ if(window.innerWidth>window.innerHeight)
   document.getElementById("laserworks").style.height="100%"
 }
 
+//Save game
+
+var storedlevel=window.localStorage.getItem('maxlevel', levels_completed);
+if(storedlevel==null)
+{
+  window.localStorage.setItem('maxlevel', levels_completed)
+}
+else
+{
+  levels_completed=storedlevel
+}
+
 //Audio management
 
 au=new Object();
@@ -452,10 +464,6 @@ function check_pass()
         return 0
       }
     }
-  }
-  if(levels_completed==current_level)
-  {
-    levels_completed+=1
   }
   return 1
 }
@@ -1043,10 +1051,15 @@ function mousedown(e)
       {
         var nextl=current_level+1
         var nextl=nextl%total_levels
+        if(check_pass()==1)
+        {
+          levels_completed+=1
+        }
         if(levels_completed>=nextl)
         {
           current_level=nextl
           load_level(current_level)
+          window.localStorage.setItem('maxlevel', levels_completed)
         }
       }
       else if(mouse_coords.x==7) //Reset button
