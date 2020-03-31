@@ -39,7 +39,7 @@ menu_option=-1
 selected={x:-1, y:-1}
 dragging_piece=0
 dragging_flipped=0
-laseron=0
+laseron=1
 filter_default_value=128
 
 //
@@ -49,7 +49,8 @@ power_grid=[]
 
 // Level data
 current_level=0
-total_levels=10
+total_levels=13
+levels_completed=0
 level0=[
 [{x:1, y:1}, [10,0]],
 [{x:7, y:7}, [11,0,256]],
@@ -112,6 +113,37 @@ level9=[
 [{x:5, y:4}, [11,0,160]],
 [{x:6, y:7}, [11,0,108]],
 ]
+level10=[
+[{x:0, y:0}, [10,3]],
+[{x:9, y:9}, [10,1]],
+[{x:3, y:6}, [11,0,8]],
+[{x:2, y:6}, [11,0,4]],
+[{x:5, y:4}, [11,0,97]],
+[{x:6, y:7}, [11,0,9]],
+[{x:1, y:8}, [11,0,160]],
+[{x:0, y:4}, [11,0,42]],
+[{x:6, y:0}, [11,0,96]],
+]
+level11=[
+[{x:6, y:6}, [10,3]],
+[{x:6, y:8}, [10,1]],
+[{x:8, y:6}, [10,3]],
+[{x:8, y:8}, [10,1]],
+[{x:3, y:6}, [11,0,49]],
+[{x:9, y:0}, [11,0,227]],
+]
+level12=[
+[{x:1, y:1}, [10,1]],
+[{x:0, y:0}, [10,3]],
+[{x:2, y:2}, [10,2]],
+[{x:3, y:3}, [10,0]],
+[{x:3, y:6}, [11,0,72]],
+[{x:2, y:6}, [11,0,128]],
+[{x:5, y:4}, [11,0,72]],
+[{x:7, y:8}, [11,0,272]],
+[{x:9, y:0}, [11,0,128]],
+[{x:9, y:9}, [11,0,80]],
+]
 
 //Mobile detection
 
@@ -124,6 +156,18 @@ if(window.innerWidth>window.innerHeight)
 {
   document.getElementById("laserworks").style.width=""
   document.getElementById("laserworks").style.height="100%"
+}
+
+//Save game
+
+var storedlevel=window.localStorage.getItem('maxlevel', levels_completed);
+if(storedlevel==null)
+{
+  window.localStorage.setItem('maxlevel', levels_completed)
+}
+else
+{
+  levels_completed=storedlevel
 }
 
 //Audio management
@@ -340,33 +384,38 @@ function draw_grid()
   draw_mirror({x:1,y:10})
   draw_splitter({x:2,y:10})
   draw_filter({x:3,y:10},filter_default_value)
+  ctx.fillStyle="white"
 
+  ctx.font="25px sans-serif"
   ctx.strokeRect(10,1010,80,80)
-  if(laseron==0)
-  {
-    fill_circle(50,1050,35,"green")
-  }
-  if(laseron==1)
-  {
-    fill_circle(50,1050,35,"red")
-  }
+  draw_line(90,1010,10,1090)
+  ctx.fillText("OPT", 15,1035)
+  ctx.textAlign="end"
+  ctx.fillText("---",85,1085)
 
   //reset button
   ctx.textAlign="start"
-  ctx.strokeRect(810,1010,80,80)
-  draw_line(890,1010,810,1090)
-  ctx.font="25px sans-serif"
-  ctx.fillText("RST",815,1035)
+  ctx.strokeRect(710,1010,80,80)
+  draw_line(790,1010,710,1090)
+  ctx.fillText("RST",715,1035)
   ctx.textAlign="end"
-  ctx.fillText("ESC",885,1085)
+  ctx.fillText("ESC",785,1085)
 
   //level load
+  if (check_pass()==1 || levels_completed-1>=current_level)
+  {
+    ctx.strokeStyle="green"
+  }
+  else
+  {
+    ctx.strokeStyle="red"
+  }
   ctx.textAlign="center"
-  ctx.strokeRect(710,1010,80,80)
-  ctx.fillText(current_level,750,1070)
+  ctx.strokeRect(810,1010,80,80)
+  ctx.fillText(current_level,850,1070)
   ctx.font="20px sans-serif"
-  ctx.fillText("LEVEL",750,1040)
-
+  ctx.fillText("LEVEL",850,1040)
+  ctx.strokeStyle="white"
   ctx.textAlign="start"
 }
 
@@ -433,9 +482,26 @@ function draw_game()
   draw_progress()
 }
 
+function check_pass()
+{
+  var lvd=eval("level"+current_level)
+  var completed=1
+  for(i=0; i<lvd.length; i++)
+  {
+    if(lvd[i][1].length==3)//Process targets
+    {
+      if (lvd[i][1][2]!=power_grid[lvd[i][0].y][lvd[i][0].x]) //Check if the target has OK levels
+      {
+        return 0
+      }
+    }
+  }
+  return 1
+}
+
 function draw_progress()
 {
-  lvd=eval("level"+current_level)
+  var lvd=eval("level"+current_level)
   var need=0
   var supplied=0
   for(i=0; i<lvd.length; i++)
@@ -653,15 +719,22 @@ function menu()
 
   ctx.font="bold 50px quizma";
   ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(350))+")";
-  ctx.fillText("New game",500,360);
+  if(levels_completed==0)
+  {
+    ctx.fillText("New game",500,360);
+  }
+  else
+  {
+    ctx.fillText("Continue",500,360)
+  }
   ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(450))+")";
   ctx.fillText("Level select",500,460);
-  ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(550))+")";
-  ctx.fillText("Tutorial",500,560);
-  ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(750))+")";
-  ctx.fillText("Settings",500,760);
-  ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(850))+")";
-  ctx.fillText("Credits",500,860);
+  // ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(550))+")";
+  // ctx.fillText("Tutorial",500,560);
+  // ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(750))+")";
+  // ctx.fillText("Settings",500,760);
+  // ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(850))+")";
+  // ctx.fillText("Credits",500,860);
 
   if (anistep<30){anistep++;} 
 }
@@ -820,7 +893,16 @@ function main_menu_listener()
     clearTimeout(ani);
     if (menu_option==1) 
     {
-      load_level(0)
+      var inilevel=0
+      if(levels_completed>0)
+      {
+        inilevel=levels_completed
+        if(inilevel>=total_levels)
+        {
+          inilevel=total_levels-1
+        }
+      }
+      load_level(inilevel)
       au.play("menu_select")
       //ctx.canvas.addEventListener("click", main_game_listener, false);
       ctx.canvas.addEventListener("mousedown", mousedown);
@@ -990,7 +1072,6 @@ function mouse_position(c, e) {
 
 function mousedown(e)
 {
-  reset_pgrid()
   //left click, drag
   if(e.buttons==1)
   {
@@ -1000,21 +1081,30 @@ function mousedown(e)
       {
         dragging_piece=mouse_coords.x
         dragging_flipped=0
-        dragging=1
         if(mouse_coords.x==3){dragging_flipped=filter_default_value}
       }
-      else if(mouse_coords.x==0) //on/off switch
+      else if(mouse_coords.x==0) //menu
       {
-        laseron^=1
-        if(laseron==0){reset_pgrid()}
+        console.log("game menu")
       }
-      else if(mouse_coords.x==7) //Level select
+      else if(mouse_coords.x==8) //next level
       {
-        current_level+=1
-        current_level=current_level%total_levels
-        load_level(current_level)
+        var nextl=current_level+1
+        if(nextl>=total_levels){
+          nextl=current_level
+        }
+        if(check_pass()==1)
+        {
+          levels_completed=nextl
+        }
+        if(levels_completed>=nextl)
+        {
+          current_level=nextl
+          load_level(current_level)
+          window.localStorage.setItem('maxlevel', levels_completed)
+        }
       }
-      else if(mouse_coords.x==8) //Reset button
+      else if(mouse_coords.x==7) //Reset button
       {
         load_level(current_level)
       }
@@ -1044,17 +1134,17 @@ function mousedown(e)
       }
       else
       {
-        board[mouse_coords.y][mouse_coords.x][1]^=1
+        board[mouse_coords.y][mouse_coords.x][1]^=1 //flip piece
       }
     }
     if(mouse_coords.y==10)
     {
       if(mouse_coords.x==3)
       {
-        if(filter_default_value==8){filter_default_value=128}
+        if(filter_default_value==8){filter_default_value=128}  //default filter mod
         else{filter_default_value/=2}
       }
-      if(mouse_coords.x==8)
+      if(mouse_coords.x==7)
       {
         anistep=1;
         clearTimeout(ani);
@@ -1064,11 +1154,19 @@ function mousedown(e)
         ctx.canvas.addEventListener("click", main_menu_listener)
         ani=setInterval(menu, interval, false);
       }
-      if(mouse_coords.x==7)
+      if(mouse_coords.x==8) // previous level
       {
-        current_level+=total_levels-1
-        current_level=current_level%total_levels
-        load_level(current_level)
+        var nextl=current_level-1
+        if(nextl<0)
+        {
+          nextl=0
+        }
+        if(levels_completed-1>=nextl)
+        {
+          current_level=nextl
+          load_level(current_level)
+        }
+        
       }
     } 
   }
@@ -1091,33 +1189,29 @@ function mouseup(e)
       board[mouse_coords.y][mouse_coords.x]=[dragging_piece,dragging_flipped]
       dragging_piece=0
     }
-    else
-    {
-      dragging_piece=0
-    }
   }
-  else
-  {
-    dragging_piece=0
-  }
+  dragging_piece=0
 }
 
 function dragmove(e)
 {
-  ctx.strokeStyle="rgb(255,128,0)"
-  switch(dragging_piece)
+  if(dragging_piece!=0)
   {
-    case 1:
-      draw_mirror(mouse_coords, dragging_flipped)
-      break
-    case 2: 
-      draw_splitter(mouse_coords, dragging_flipped)
-      break
-    case 3: 
-      draw_filter(mouse_coords, dragging_flipped)
-      break
+    ctx.strokeStyle="rgb(255,128,0)"
+    switch(dragging_piece)
+    {
+      case 1:
+        draw_mirror(mouse_coords, dragging_flipped)
+        break
+      case 2: 
+        draw_splitter(mouse_coords, dragging_flipped)
+        break
+      case 3: 
+        draw_filter(mouse_coords, dragging_flipped)
+        break
+    }
+    ctx.strokeStyle="white"
   }
-  ctx.strokeStyle="white"
 }
 
 ctx.canvas.addEventListener("click", update_menu_option);
