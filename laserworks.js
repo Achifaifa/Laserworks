@@ -51,7 +51,7 @@ power_grid=[]
 current_level=0
 total_levels=13
 levels_completed=0
-score=Array(total_levels-1)
+score=Array(total_levels-1).fill(0)
 level0=[
 [{x:1, y:1}, [10,0]],
 [{x:7, y:7}, [11,0,256]],
@@ -744,7 +744,7 @@ function menu()
     ctx.fillText("Continue",500,360)
   }
   ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(450))+")";
-  ctx.fillText("Levels",500,460);
+  ctx.fillText("Scores",500,460);
   // ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(550))+")";
   // ctx.fillText("Tutorial",500,560);
   // ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(750))+")";
@@ -767,9 +767,21 @@ function level_select()
   ctx.fillText("Laserworks",500,160);
   ctx.textAlign="end"
   ctx.font="60px quizma";
-  ctx.fillText("Levels",950,200);
+  ctx.fillText("Scores",950,200);
 
-
+  ctx.textAlign="end"
+  ctx.font="30px quizma";
+  for(i=0; i<10; i++)
+  {
+    for(j=0; j<10; j++)
+    {
+      var sc=score[i*10+j]
+      if(typeof(sc)!="undefined")
+      {
+        ctx.fillText(sc, 100+90*j, 350+90*i)
+      }
+    }
+  }
 
   ctx.textAlign="center"
   ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(850))+")";
