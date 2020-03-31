@@ -1093,7 +1093,7 @@ function mousedown(e)
         if(nextl>=total_levels){
           nextl=current_level
         }
-        if(check_pass()==1)
+        if(check_pass()==1 && levels_completed<nextl)
         {
           levels_completed=nextl
         }
