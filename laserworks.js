@@ -51,6 +51,7 @@ power_grid=[]
 current_level=0
 total_levels=13
 levels_completed=0
+score=Array(total_levels-1).fill(999)
 level0=[
 [{x:1, y:1}, [10,0]],
 [{x:7, y:7}, [11,0,256]],
@@ -61,17 +62,17 @@ level1=[
 ]
 level2=[
 [{x:1, y:1}, [10,0]],
-[{x:7, y:7}, [11,0,100]],
-]
-level3=[
-[{x:1, y:1}, [10,0]],
 [{x:4, y:4}, [11,0,128]],
 [{x:7, y:7}, [11,0,128]],
 ]
-level4=[
+level3=[
 [{x:1, y:1}, [10,0]],
 [{x:4, y:4}, [11,0,64]],
 [{x:7, y:7}, [11,0,4]],
+]
+level4=[
+[{x:1, y:1}, [10,0]],
+[{x:7, y:7}, [11,0,100]],
 ]
 level5=[
 [{x:1, y:1}, [10,0]],
@@ -158,16 +159,18 @@ if(window.innerWidth>window.innerHeight)
   document.getElementById("laserworks").style.height="100%"
 }
 
-//Save game
+//Save/Load game
 
 var storedlevel=window.localStorage.getItem('maxlevel', levels_completed);
 if(storedlevel==null)
 {
   window.localStorage.setItem('maxlevel', levels_completed)
+  window.localStorage.setItem('score', JSON.stringify(score))
 }
 else
 {
   levels_completed=storedlevel
+  score=JSON.parse(window.localStorage.getItem('score'))
 }
 
 //Audio management
@@ -486,7 +489,7 @@ function check_pass()
 {
   var lvd=eval("level"+current_level)
   var completed=1
-  for(i=0; i<lvd.length; i++)
+  for(var i=0; i<lvd.length; i++)
   {
     if(lvd[i][1].length==3)//Process targets
     {
@@ -497,6 +500,23 @@ function check_pass()
     }
   }
   return 1
+}
+
+function calculate_score()
+{
+  var tempscore=0
+  for(var i=0; i<10; i++)
+  {
+    for(var j=0; j<10; j++)
+    {
+      var t=board[j][i][0]
+      if(t!=10 && t!=11)
+      {
+        tempscore+=t
+      }
+    }
+  }
+  return tempscore
 }
 
 function draw_progress()
@@ -728,7 +748,7 @@ function menu()
     ctx.fillText("Continue",500,360)
   }
   ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(450))+")";
-  ctx.fillText("Level select",500,460);
+  ctx.fillText("Scores",500,460);
   // ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(550))+")";
   // ctx.fillText("Tutorial",500,560);
   // ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(750))+")";
@@ -751,9 +771,28 @@ function level_select()
   ctx.fillText("Laserworks",500,160);
   ctx.textAlign="end"
   ctx.font="60px quizma";
-  ctx.fillText("Levels",950,200);
+  ctx.fillText("Scores",950,200);
+
+  ctx.textAlign="end"
+  ctx.font="30px quizma";
+  for(i=0; i<10; i++)
+  {
+    for(j=0; j<10; j++)
+    {
+      var sc=score[j*10+i]
+      if(typeof(sc)!="undefined" && sc!=999)
+      {
+        ctx.fillText(sc, 100+90*i, 350+90*j)
+      }
+      else if(sc==999)
+      {
+        ctx.fillText("--", 100+90*i, 350+90*j)
+      }
+    }
+  }
 
   ctx.textAlign="center"
+  ctx.font="bold 50px quizma";
   ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(850))+")";
   ctx.fillText("Back",500,860);
 
@@ -1090,7 +1129,8 @@ function mousedown(e)
       else if(mouse_coords.x==8) //next level
       {
         var nextl=current_level+1
-        if(nextl>=total_levels){
+        if(nextl>=total_levels)
+        {
           nextl=current_level
         }
         if(check_pass()==1 && levels_completed<nextl)
@@ -1099,9 +1139,15 @@ function mousedown(e)
         }
         if(levels_completed>=nextl)
         {
+          var sc=calculate_score()
+          if(sc<score[current_level])
+          {
+            score[current_level]=sc
+          }
           current_level=nextl
-          load_level(current_level)
+          load_level(nextl)
           window.localStorage.setItem('maxlevel', levels_completed)
+          window.localStorage.setItem('score', JSON.stringify(score))
         }
       }
       else if(mouse_coords.x==7) //Reset button
