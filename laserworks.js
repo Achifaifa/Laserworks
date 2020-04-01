@@ -165,7 +165,7 @@ var storedlevel=window.localStorage.getItem('maxlevel', levels_completed);
 if(storedlevel==null)
 {
   window.localStorage.setItem('maxlevel', levels_completed)
-  window.localStorage.setItem(('score'), JSON.stringify(score))
+  window.localStorage.setItem('score', JSON.stringify(score))
 }
 else
 {
@@ -489,7 +489,7 @@ function check_pass()
 {
   var lvd=eval("level"+current_level)
   var completed=1
-  for(i=0; i<lvd.length; i++)
+  for(var i=0; i<lvd.length; i++)
   {
     if(lvd[i][1].length==3)//Process targets
     {
@@ -505,11 +505,15 @@ function check_pass()
 function calculate_score()
 {
   var tempscore=0
-  for(i=0; i<10; i++)
+  for(var i=0; i<10; i++)
   {
-    for(j=0; j<10; j++)
+    for(var j=0; j<10; j++)
     {
-      tempscore+=board[j][i][0]
+      var t=board[j][i][0]
+      if(t!=10 && t!=11)
+      {
+        tempscore+=t
+      }
     }
   }
   return tempscore
@@ -775,15 +779,20 @@ function level_select()
   {
     for(j=0; j<10; j++)
     {
-      var sc=score[i*10+j]
-      if(typeof(sc)!="undefined")
+      var sc=score[j*10+i]
+      if(typeof(sc)!="undefined" && sc!=0)
       {
-        ctx.fillText(sc, 100+90*j, 350+90*i)
+        ctx.fillText(sc, 100+90*i, 350+90*j)
+      }
+      else if(sc==0)
+      {
+        ctx.fillText("--", 100+90*i, 350+90*j)
       }
     }
   }
 
   ctx.textAlign="center"
+  ctx.font="bold 50px quizma";
   ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(850))+")";
   ctx.fillText("Back",500,860);
 
@@ -1120,7 +1129,8 @@ function mousedown(e)
       else if(mouse_coords.x==8) //next level
       {
         var nextl=current_level+1
-        if(nextl>=total_levels){
+        if(nextl>=total_levels)
+        {
           nextl=current_level
         }
         if(check_pass()==1 && levels_completed<nextl)
@@ -1129,11 +1139,15 @@ function mousedown(e)
         }
         if(levels_completed>=nextl)
         {
+          var sc=calculate_score()
+          if(sc<score[current_level])
+          {
+            score[current_level]=sc
+          }
           current_level=nextl
-          load_level(current_level)
+          load_level(nextl)
           window.localStorage.setItem('maxlevel', levels_completed)
-          score[current_level-1]=calculate_score()
-            window.localStorage.setItem(('score'), JSON.stringify(score))
+          window.localStorage.setItem('score', JSON.stringify(score))
         }
       }
       else if(mouse_coords.x==7) //Reset button
