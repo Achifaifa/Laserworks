@@ -51,7 +51,7 @@ power_grid=[]
 current_level=0
 total_levels=13
 levels_completed=0
-score=Array(total_levels-1).fill(0)
+score=Array(total_levels-1).fill(999)
 level0=[
 [{x:1, y:1}, [10,0]],
 [{x:7, y:7}, [11,0,256]],
@@ -780,11 +780,11 @@ function level_select()
     for(j=0; j<10; j++)
     {
       var sc=score[j*10+i]
-      if(typeof(sc)!="undefined" && sc!=0)
+      if(typeof(sc)!="undefined" && sc!=999)
       {
         ctx.fillText(sc, 100+90*i, 350+90*j)
       }
-      else if(sc==0)
+      else if(sc==999)
       {
         ctx.fillText("--", 100+90*i, 350+90*j)
       }
