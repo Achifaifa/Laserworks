@@ -388,14 +388,8 @@ function draw_grid()
   ctx.lineWidth=1;
   for (cx=100; cx<1000; cx+=100){
     for (cy=100; cy<1000; cy+=100){
-      if(grid==0){
-        draw_line(cx-3,cy,cx+3,cy, "white");
-        draw_line(cx,cy-3,cx,cy+3, "white");
-      }
-      if(grid==1)
-      {
-        ctx.strokeRect(cx,cy,1,1);
-      }
+      draw_line(cx-3,cy,cx+3,cy, "white");
+      draw_line(cx,cy-3,cx,cy+3, "white");
     }
   }
   draw_line(0,1000,1000,1000)
