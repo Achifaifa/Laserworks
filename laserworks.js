@@ -33,7 +33,6 @@ menu_option=-1
 selected={x:-1, y:-1}
 dragging_piece=0
 dragging_flipped=0
-laseron=1
 filter_default_value=128
 
 //
@@ -285,14 +284,21 @@ function draw_meter(coords)
 
 function draw_measure(coords)
 {
+  ctx.lineWidth=2
   c={x:coord_to_pixel(coords.x), y:coord_to_pixel(coords.y)}
   ctx.strokeRect(c.x-40,c.y-40,80,80)
+  ctx.stroke()
   draw_line(c.x,c.y-50,c.x,c.y-30)
   draw_line(c.x,c.y+50,c.x,c.y+30)
   draw_line(c.x-50,c.y,c.x-30,c.y)
   draw_line(c.x+50,c.y,c.x+30,c.y)
-  ctx.textAlign="center"
-  ctx.fillText(power_grid[coords.y][coords.x],c.x+20,c.y-20)
+  if(coords.y<10)
+  {
+    ctx.textAlign="center"
+    ctx.fillText(power_grid[coords.y][coords.x],c.x+20,c.y-20)
+  }
+  ctx.lineWidth=1
+  ctx.fillStyle="white"
 }
 
 // 0-right, 1-down, 2-left, 3-up
@@ -465,6 +471,19 @@ function draw_game()
       }
     }
   }
+
+  //Draw laser path
+  reset_pgrid()
+  lvd=eval("level"+current_level)
+  for(i=0; i<lvd.length; i++)
+  {
+    if(lvd[i][1][0]==10)
+    {
+      draw_laser_path(lvd[i])
+    }
+  }
+
+  //Draw dragging piece
   ctx.strokeStyle="rgb(255,128,0)"
   if(dragging_piece==1)
   {
@@ -483,20 +502,6 @@ function draw_game()
     draw_measure({x:mouse_coords.x, y: mouse_coords.y})
   }
   ctx.strokeStyle="white"
-
-  //Draw laser path
-  if(laseron==1)
-  {
-    reset_pgrid()
-    lvd=eval("level"+current_level)
-    for(i=0; i<lvd.length; i++)
-    {
-      if(lvd[i][1][0]==10)
-      {
-        draw_laser_path(lvd[i])
-      }
-    }
-  }
 
   draw_progress()
 }
