@@ -1140,7 +1140,7 @@ function mousedown(e)
         if(levels_completed>=nextl)
         {
           var sc=calculate_score()
-          if(sc<score[current_level])
+          if(sc<score[current_level] && sc!=0)
           {
             score[current_level]=sc
           }
