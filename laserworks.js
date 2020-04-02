@@ -15,12 +15,6 @@ fps=30
 interval=1000/fps
 
 sfx=1
-sfx_types=["off", "on"]
-music=1
-music_types=["off", "on"]
-grid=0
-grid_types=["cross", "dot", "none"]
-ai=0
 
 //
 
@@ -779,8 +773,8 @@ function menu()
   ctx.fillText("Scores",500,460);
   // ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(550))+")";
   // ctx.fillText("Tutorial",500,560);
-  // ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(750))+")";
-  // ctx.fillText("Settings",500,760);
+  ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(750))+")";
+  ctx.fillText("Settings",500,760);
   // ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(850))+")";
   // ctx.fillText("Credits",500,860);
 
@@ -868,41 +862,31 @@ function settings()
   ctx.clearRect(0,0,1000,1000)
 
   salpha=anistep/30
-  draw_line(80,120,80,880, "white", salpha);
-  draw_line(80,120,100,120, "white", salpha);
-  draw_line(250,120,275,120, "white", salpha);
 
   ctx.fillStyle="rgba(255,255,255,"+salpha+")";
-  ctx.textAlign="start";
+  ctx.textAlign="center";
+  ctx.font="100px spaceage";
+  ctx.fillText("laserworks",500,160);
+  ctx.textAlign="end"
+  ctx.font="60px quizma";
+  ctx.fillText("Settings",950,200);
 
-  ctx.font="120px quizma";
-  ctx.fillText("Xi",125,160);
-  ctx.font="75px quizma";
-  ctx.fillText("Settings",300,145);
-  ctx.font="20px quizma";
-  ctx.fillText(version,210,160);
-  ctx.font="bold 50px quizma";
-
-  ctx.fillStyle="rgba(255,255,255,"+(30*salpha/menu_alpha(200))+")";
-  ctx.fillText("Grid",150,260);
-  ctx.fillStyle="rgba(255,255,255,"+(30*salpha/menu_alpha(300))+")";
-  ctx.fillText("Players",150,360);
+  ctx.textAlign="center"
   ctx.fillStyle="rgba(255,255,255,"+(30*salpha/menu_alpha(400))+")";
-  ctx.fillText("SFX",150,460);
-  ctx.fillStyle="rgba(255,255,255,"+(30*salpha/menu_alpha(500))+")";
-  ctx.fillText("Music",150,560);
-  ctx.fillStyle="rgba(255,255,255,"+(30*salpha/menu_alpha(600))+")";
-  ctx.fillText("AI",150,660);
+  if(sfx==1)
+  {
+    ctx.fillText("SFX on",500,460);
+  }
+  else
+  {
+    ctx.fillText("SFX off",500,460);
+  }
+  
   ctx.fillStyle="rgba(255,255,255,"+(30*salpha/menu_alpha(700))+")";
-  ctx.fillText("Back",150,760);
+  ctx.fillText("Back",500,760);
 
-  ctx.font="45px quizma";
-  ctx.fillStyle="rgba(255,255,255,"+salpha+")";
-  ctx.fillText(grid_types[grid],350,260);
-  ctx.fillText(flip_types[flip],350,360);
-  ctx.fillText(sfx_types[sfx],350,460);
-  ctx.fillText(music_types[music],350,560);
-  ctx.fillText(difficulty_types[difficulty],350,660);
+  // ctx.font="45px quizma";
+  // ctx.fillStyle="rgba(255,255,255,"+salpha+")";
 
   if (anistep<30){anistep++;}
 }
@@ -951,7 +935,7 @@ function update_click_coords()
 
 function main_menu_listener()
 {  
-  valid_options=[1,2]
+  valid_options=[1,2,5]
 
   if (valid_options.includes(menu_option))
   {
@@ -1023,35 +1007,15 @@ function levels_listener()
 
 function settings_menu_listener()
 {
-  valid_options=[1,2,3,4,5,6]
+  valid_options=[2,5]
   if (valid_options.includes(menu_option))
   {
-    if (menu_option==1)
-    {
-      au.play("menu_option")
-      grid=(grid+1)%grid_types.length
-    }
     if (menu_option==2)
     {
       au.play("menu_option")
-      flip=(flip+1)%flip_types.length
+      sfx^=1
     }
-    if (menu_option==3)
-    {
-      au.play("menu_option")
-      sfx=(sfx+1)%sfx_types.length
-    }
-    if (menu_option==4)
-    {
-      au.play("menu_option")
-      music=(music+1)%music_types.length
-    }
-    if (menu_option==5)
-    {
-      au.play("menu_option")
-      difficulty=(difficulty+1)%difficulty_types.length
-    }
-    else if (menu_option==6)
+    else if (menu_option==5)
     {
       au.play("menu_back")
       ctx.canvas.removeEventListener("click", settings_menu_listener, false);
