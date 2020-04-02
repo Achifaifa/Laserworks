@@ -295,6 +295,7 @@ function draw_measure(coords)
   if(coords.y<10)
   {
     ctx.textAlign="center"
+    ctx.font="15px sans-serif"
     ctx.fillText(power_grid[coords.y][coords.x],c.x+20,c.y-20)
   }
   ctx.lineWidth=1
@@ -561,6 +562,7 @@ function draw_progress()
   ctx.stroke()
   ctx.strokeStyle="white"
   ctx.textAlign="center"
+  ctx.font="15px sans-serif"
   ctx.fillText(parseInt(supplied)+"/"+need,950,1055)
   ctx.textAlign="start"
 
@@ -1188,6 +1190,7 @@ function mousedown(e)
       if(mouse_coords.x==7)
       {
         anistep=1;
+        au.play("menu_back")
         clearTimeout(ani);
         ctx.canvas.removeEventListener("mousedown", mousedown);
         ctx.canvas.removeEventListener("mouseup", mouseup);
