@@ -273,11 +273,32 @@ function draw_splitter(coords,rot=0)
 
 function draw_filter(coords,fv=128)
 {
-    ctx.lineWidth=2
-    c={x:coord_to_pixel(coords.x), y:coord_to_pixel(coords.y)}
-    ctx.strokeRect(c.x-20,c.y-20,40,40)
-    ctx.font="20px sans-serif"
-    ctx.fillText(fv,c.x-20,c.y)
+  ctx.lineWidth=2
+  c={x:coord_to_pixel(coords.x), y:coord_to_pixel(coords.y)}
+  ctx.strokeRect(c.x-20,c.y-20,40,40)
+  ctx.font="20px sans-serif"
+  ctx.fillText(fv,c.x-20,c.y)
+}
+
+function draw_meter(coords)
+{
+  ctx.lineWidth=2
+  c={x:coord_to_pixel(coords.x), y:coord_to_pixel(coords.y)}
+  draw_line(c.x,c.y,c.x-30,c.y+30)
+  draw_circle(c.x+15,c.y-15,20)
+  ctx.lineWidth=1
+}
+
+function draw_measure(coords)
+{
+  c={x:coord_to_pixel(coords.x), y:coord_to_pixel(coords.y)}
+  ctx.strokeRect(c.x-40,c.y-40,80,80)
+  draw_line(c.x,c.y-50,c.x,c.y-30)
+  draw_line(c.x,c.y+50,c.x,c.y+30)
+  draw_line(c.x-50,c.y,c.x-30,c.y)
+  draw_line(c.x+50,c.y,c.x+30,c.y)
+  ctx.textAlign="center"
+  ctx.fillText(power_grid[coords.y][coords.x],c.x+20,c.y-20)
 }
 
 // 0-right, 1-down, 2-left, 3-up
@@ -387,14 +408,17 @@ function draw_grid()
   draw_mirror({x:1,y:10})
   draw_splitter({x:2,y:10})
   draw_filter({x:3,y:10},filter_default_value)
+  draw_meter({x:6,y:10})
   ctx.fillStyle="white"
 
+  //option button
   ctx.font="25px sans-serif"
   ctx.strokeRect(10,1010,80,80)
   draw_line(90,1010,10,1090)
   ctx.fillText("OPT", 15,1035)
   ctx.textAlign="end"
   ctx.fillText("---",85,1085)
+
 
   //reset button
   ctx.textAlign="start"
@@ -465,6 +489,10 @@ function draw_game()
   else if(dragging_piece==3)
   {
     draw_filter({x:mouse_coords.x, y: mouse_coords.y},dragging_flipped)
+  }
+  else if(dragging_piece==6)
+  {
+    draw_measure({x:mouse_coords.x, y: mouse_coords.y})
   }
   ctx.strokeStyle="white"
 
@@ -1116,6 +1144,10 @@ function mousedown(e)
   {
     if(mouse_coords.y==10)
     {
+      if(mouse_coords.x==6)
+      {
+        dragging_piece=6
+      }
       if(mouse_coords.x>0 && mouse_coords.x<4) //component
       {
         dragging_piece=mouse_coords.x
@@ -1228,7 +1260,7 @@ function mousedown(e)
 
 function mouseup(e)
 {
-  if(mouse_coords.y<10 && dragging_piece!=0)
+  if(mouse_coords.y<10 && dragging_piece!=0 && dragging_piece!=6)
   {
     if(board[mouse_coords.y][mouse_coords.x][0]<10)
     {
