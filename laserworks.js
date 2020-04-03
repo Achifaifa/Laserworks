@@ -902,12 +902,27 @@ function credits()
   //ctx.fillText("Music",800,360);
   ctx.fillText("SFX",750,460);
   ctx.fillText("Fonts",350,560);
-  ctx.fillStyle="rgba(255,255,255,"+(30*calpha/menu_alpha(850))+")";
+  
+
 
   ctx.textAlign="center"
-  ctx.fillText("Back",500,860);
+  ctx.fillText("Special Thanks",500,760)
+  ctx.fillStyle="rgba(255,255,255,"+(30*calpha/menu_alpha(950))+")";
+  ctx.fillText("Back",500,960);
 
+  ctx.fillStyle="white"
+  ctx.font="20px quizma"
+  ctx.fillText("❤",400,860)
+  ctx.fillText("❤",600,860)
   ctx.font="45px quizma";
+  
+  ctx.fillText("Lea",500,860)
+  ctx.textAlign="start"
+  ctx.fillText("q3muyq3",650,860)
+  ctx.textAlign="end"
+  ctx.fillText("Klon",350,860)
+  ctx.textAlign="center"
+
   ctx.fillStyle="rgba(255,255,255,"+(30*calpha/menu_alpha(350))+")";
   ctx.fillText("Achifaifa",500,360);
   ctx.fillStyle="rgba(255,255,255,"+(30*calpha/menu_alpha(450))+")";
@@ -916,6 +931,7 @@ function credits()
   ctx.fillText("Studio Typo",500,560);
   ctx.fillStyle="rgba(255,255,255,"+(50*calpha/menu_alpha(650))+")";
   ctx.fillText("Justin Callaghan",500,660);
+  
 
   if (anistep<30){anistep++}
 }
@@ -985,6 +1001,7 @@ function update_menu_option()
   else if(mouse_pos.y>620 && mouse_pos.y<670){menu_option=4;}
   else if(mouse_pos.y>720 && mouse_pos.y<770){menu_option=5;}
   else if(mouse_pos.y>820 && mouse_pos.y<870){menu_option=6;}
+  else if(mouse_pos.y>920 && mouse_pos.y<970){menu_option=7;}
   else {menu_option=-1}
 }
 
@@ -1089,7 +1106,7 @@ function settings_menu_listener()
 
 function credits_menu_listener()
 {
-  valid_options=[1,2,3,6]
+  valid_options=[1,2,3,7]
   {
     if (menu_option==1)
     {
@@ -1111,7 +1128,7 @@ function credits_menu_listener()
       au.play("menu_option")
       window.open('https://fonts.webtoolhub.com/font-n29145-space-age.aspx?lic=1')
     }    
-    if (menu_option==6)
+    if (menu_option==7)
     {
       au.play("menu_back")
       ctx.canvas.removeEventListener("click", credits_menu_listener, false);
