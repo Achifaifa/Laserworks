@@ -15,12 +15,6 @@ fps=30
 interval=1000/fps
 
 sfx=1
-sfx_types=["off", "on"]
-music=1
-music_types=["off", "on"]
-grid=0
-grid_types=["cross", "dot", "none"]
-ai=0
 
 //
 
@@ -39,7 +33,6 @@ menu_option=-1
 selected={x:-1, y:-1}
 dragging_piece=0
 dragging_flipped=0
-laseron=1
 filter_default_value=128
 
 //
@@ -49,9 +42,9 @@ power_grid=[]
 
 // Level data
 current_level=0
-total_levels=13
+total_levels=20
 levels_completed=0
-score=Array(total_levels-1).fill(999)
+score=Array(total_levels).fill(999)
 level0=[
 [{x:1, y:1}, [10,0]],
 [{x:7, y:7}, [11,0,256]],
@@ -144,6 +137,65 @@ level12=[
 [{x:7, y:8}, [11,0,272]],
 [{x:9, y:0}, [11,0,128]],
 [{x:9, y:9}, [11,0,80]],
+]
+level13=[
+[{x:1, y:1}, [10,1]],
+[{x:5, y:5}, [10,0]],
+[{x:0, y:9}, [10,1]],
+[{x:1, y:5}, [11,0,64]],
+[{x:4, y:6}, [11,0,186]],
+[{x:8, y:1}, [11,0,40]],
+[{x:5, y:9}, [11,0,40]],
+[{x:9, y:0}, [11,0,40]],
+[{x:9, y:8}, [11,0,15]],
+[{x:7, y:5}, [11,0,15]],
+[{x:3, y:2}, [11,0,100]],
+[{x:7, y:9}, [11,0,64]],
+]
+level14=[
+[{x:0, y:0}, [10,0]],
+[{x:0, y:1}, [10,0]],
+[{x:0, y:2}, [10,0]],
+[{x:0, y:3}, [10,0]],
+[{x:0, y:4}, [10,0]],
+[{x:0, y:5}, [10,0]],
+[{x:3, y:2}, [11,0,336]],
+[{x:7, y:9}, [11,0,336]],
+]
+level15=[
+[{x:5, y:5}, [10,0]],
+[{x:4, y:5}, [10,2]],
+[{x:7, y:5}, [11,0,38]],
+[{x:3, y:2}, [11,0,47]],
+[{x:7, y:9}, [11,0,37]],
+]
+level16=[
+[{x:5, y:0}, [10,3]],
+[{x:7, y:5}, [11,0,90]],
+[{x:3, y:2}, [11,0,86]],
+[{x:7, y:9}, [11,0,48]],
+]
+level17=[
+[{x:5, y:5}, [10,0]],
+[{x:0, y:9}, [10,1]],
+[{x:1, y:5}, [11,0,64]],
+[{x:1, y:6}, [11,0,64]],
+[{x:8, y:8}, [11,0,64]],
+[{x:5, y:7}, [11,0,20]],
+[{x:1, y:0}, [11,0,56]],
+[{x:9, y:8}, [11,0,52]],
+]
+level18=[
+[{x:0, y:9}, [10,1]],
+[{x:1, y:0}, [11,0,47]],
+[{x:9, y:8}, [11,0,13]],
+]
+level19=[
+[{x:9, y:0}, [10,3]],
+[{x:8, y:0}, [10,3]],
+[{x:7, y:5}, [11,0,208]],
+[{x:3, y:2}, [11,0,102]],
+[{x:7, y:9}, [11,0,126]],
 ]
 
 //Mobile detection
@@ -273,11 +325,40 @@ function draw_splitter(coords,rot=0)
 
 function draw_filter(coords,fv=128)
 {
-    ctx.lineWidth=2
-    c={x:coord_to_pixel(coords.x), y:coord_to_pixel(coords.y)}
-    ctx.strokeRect(c.x-20,c.y-20,40,40)
-    ctx.font="20px sans-serif"
-    ctx.fillText(fv,c.x-20,c.y)
+  ctx.lineWidth=2
+  c={x:coord_to_pixel(coords.x), y:coord_to_pixel(coords.y)}
+  ctx.strokeRect(c.x-20,c.y-20,40,40)
+  ctx.font="20px sans-serif"
+  ctx.fillText(fv,c.x-20,c.y)
+}
+
+function draw_meter(coords)
+{
+  ctx.lineWidth=2
+  c={x:coord_to_pixel(coords.x), y:coord_to_pixel(coords.y)}
+  draw_line(c.x,c.y,c.x-30,c.y+30)
+  draw_circle(c.x+15,c.y-15,20)
+  ctx.lineWidth=1
+}
+
+function draw_measure(coords)
+{
+  ctx.lineWidth=2
+  c={x:coord_to_pixel(coords.x), y:coord_to_pixel(coords.y)}
+  ctx.strokeRect(c.x-40,c.y-40,80,80)
+  ctx.stroke()
+  draw_line(c.x,c.y-50,c.x,c.y-30)
+  draw_line(c.x,c.y+50,c.x,c.y+30)
+  draw_line(c.x-50,c.y,c.x-30,c.y)
+  draw_line(c.x+50,c.y,c.x+30,c.y)
+  if(coords.y<10)
+  {
+    ctx.textAlign="center"
+    ctx.font="15px sans-serif"
+    ctx.fillText(power_grid[coords.y][coords.x],c.x+20,c.y-20)
+  }
+  ctx.lineWidth=1
+  ctx.fillStyle="white"
 }
 
 // 0-right, 1-down, 2-left, 3-up
@@ -373,28 +454,25 @@ function draw_grid()
   ctx.lineWidth=1;
   for (cx=100; cx<1000; cx+=100){
     for (cy=100; cy<1000; cy+=100){
-      if(grid==0){
-        draw_line(cx-3,cy,cx+3,cy, "white");
-        draw_line(cx,cy-3,cx,cy+3, "white");
-      }
-      if(grid==1)
-      {
-        ctx.strokeRect(cx,cy,1,1);
-      }
+      draw_line(cx-3,cy,cx+3,cy, "white");
+      draw_line(cx,cy-3,cx,cy+3, "white");
     }
   }
   draw_line(0,1000,1000,1000)
   draw_mirror({x:1,y:10})
   draw_splitter({x:2,y:10})
   draw_filter({x:3,y:10},filter_default_value)
+  draw_meter({x:6,y:10})
   ctx.fillStyle="white"
 
+  //option button
   ctx.font="25px sans-serif"
   ctx.strokeRect(10,1010,80,80)
   draw_line(90,1010,10,1090)
   ctx.fillText("OPT", 15,1035)
   ctx.textAlign="end"
   ctx.fillText("---",85,1085)
+
 
   //reset button
   ctx.textAlign="start"
@@ -415,7 +493,7 @@ function draw_grid()
   }
   ctx.textAlign="center"
   ctx.strokeRect(810,1010,80,80)
-  ctx.fillText(current_level,850,1070)
+  ctx.fillText(parseInt(current_level)+1,850,1070)
   ctx.font="20px sans-serif"
   ctx.fillText("LEVEL",850,1040)
   ctx.strokeStyle="white"
@@ -453,6 +531,19 @@ function draw_game()
       }
     }
   }
+
+  //Draw laser path
+  reset_pgrid()
+  lvd=eval("level"+current_level)
+  for(i=0; i<lvd.length; i++)
+  {
+    if(lvd[i][1][0]==10)
+    {
+      draw_laser_path(lvd[i])
+    }
+  }
+
+  //Draw dragging piece
   ctx.strokeStyle="rgb(255,128,0)"
   if(dragging_piece==1)
   {
@@ -466,21 +557,11 @@ function draw_game()
   {
     draw_filter({x:mouse_coords.x, y: mouse_coords.y},dragging_flipped)
   }
-  ctx.strokeStyle="white"
-
-  //Draw laser path
-  if(laseron==1)
+  else if(dragging_piece==6)
   {
-    reset_pgrid()
-    lvd=eval("level"+current_level)
-    for(i=0; i<lvd.length; i++)
-    {
-      if(lvd[i][1][0]==10)
-      {
-        draw_laser_path(lvd[i])
-      }
-    }
+    draw_measure({x:mouse_coords.x, y: mouse_coords.y})
   }
+  ctx.strokeStyle="white"
 
   draw_progress()
 }
@@ -540,6 +621,7 @@ function draw_progress()
   ctx.stroke()
   ctx.strokeStyle="white"
   ctx.textAlign="center"
+  ctx.font="15px sans-serif"
   ctx.fillText(parseInt(supplied)+"/"+need,950,1055)
   ctx.textAlign="start"
 
@@ -751,10 +833,10 @@ function menu()
   ctx.fillText("Scores",500,460);
   // ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(550))+")";
   // ctx.fillText("Tutorial",500,560);
-  // ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(750))+")";
-  // ctx.fillText("Settings",500,760);
-  // ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(850))+")";
-  // ctx.fillText("Credits",500,860);
+  ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(750))+")";
+  ctx.fillText("Settings",500,760);
+  ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(850))+")";
+  ctx.fillText("Credits",500,860);
 
   if (anistep<30){anistep++;} 
 }
@@ -813,24 +895,26 @@ function credits()
   ctx.font="60px quizma";
   ctx.fillText("Credits",950,200);
 
-  ctx.textAlign="center"
+  
   ctx.font="bold 50px quizma";
-  ctx.fillText("Code",350,260);
-  ctx.fillText("Music",750,460);
-  ctx.fillText("SFX",250,460);
-  ctx.fillText("Fonts",350,660);
+  ctx.fillText("Code",350,360);
+  //ctx.fillText("Music",800,360);
+  ctx.fillText("SFX",750,460);
+  ctx.fillText("Fonts",350,560);
   ctx.fillStyle="rgba(255,255,255,"+(30*calpha/menu_alpha(850))+")";
+
+  ctx.textAlign="center"
   ctx.fillText("Back",500,860);
 
   ctx.font="45px quizma";
-  ctx.fillStyle="rgba(255,255,255,"+(30*calpha/menu_alpha(250))+")";
-  ctx.fillText("Achifaifa",350,260);
   ctx.fillStyle="rgba(255,255,255,"+(30*calpha/menu_alpha(350))+")";
-  ctx.fillText("broumbroum",350,360);
-  ctx.fillStyle="rgba(255,255,255,"+(50*calpha/menu_alpha(450))+")";
-  ctx.fillText("Studio Typo",350,460);
+  ctx.fillText("Achifaifa",500,360);
+  ctx.fillStyle="rgba(255,255,255,"+(30*calpha/menu_alpha(450))+")";
+  ctx.fillText("broumbroum",500,460);
   ctx.fillStyle="rgba(255,255,255,"+(50*calpha/menu_alpha(550))+")";
-  ctx.fillText("Justin Callaghan",350,560);//https://fonts.webtoolhub.com/font-n29145-space-age.aspx?lic=1
+  ctx.fillText("Studio Typo",500,560);
+  ctx.fillStyle="rgba(255,255,255,"+(50*calpha/menu_alpha(650))+")";
+  ctx.fillText("Justin Callaghan",500,660);
 
   if (anistep<30){anistep++}
 }
@@ -840,41 +924,31 @@ function settings()
   ctx.clearRect(0,0,1000,1000)
 
   salpha=anistep/30
-  draw_line(80,120,80,880, "white", salpha);
-  draw_line(80,120,100,120, "white", salpha);
-  draw_line(250,120,275,120, "white", salpha);
 
   ctx.fillStyle="rgba(255,255,255,"+salpha+")";
-  ctx.textAlign="start";
+  ctx.textAlign="center";
+  ctx.font="100px spaceage";
+  ctx.fillText("laserworks",500,160);
+  ctx.textAlign="end"
+  ctx.font="60px quizma";
+  ctx.fillText("Settings",950,200);
 
-  ctx.font="120px quizma";
-  ctx.fillText("Xi",125,160);
-  ctx.font="75px quizma";
-  ctx.fillText("Settings",300,145);
-  ctx.font="20px quizma";
-  ctx.fillText(version,210,160);
-  ctx.font="bold 50px quizma";
-
-  ctx.fillStyle="rgba(255,255,255,"+(30*salpha/menu_alpha(200))+")";
-  ctx.fillText("Grid",150,260);
-  ctx.fillStyle="rgba(255,255,255,"+(30*salpha/menu_alpha(300))+")";
-  ctx.fillText("Players",150,360);
+  ctx.textAlign="center"
   ctx.fillStyle="rgba(255,255,255,"+(30*salpha/menu_alpha(400))+")";
-  ctx.fillText("SFX",150,460);
-  ctx.fillStyle="rgba(255,255,255,"+(30*salpha/menu_alpha(500))+")";
-  ctx.fillText("Music",150,560);
-  ctx.fillStyle="rgba(255,255,255,"+(30*salpha/menu_alpha(600))+")";
-  ctx.fillText("AI",150,660);
+  if(sfx==1)
+  {
+    ctx.fillText("SFX on",500,460);
+  }
+  else
+  {
+    ctx.fillText("SFX off",500,460);
+  }
+  
   ctx.fillStyle="rgba(255,255,255,"+(30*salpha/menu_alpha(700))+")";
-  ctx.fillText("Back",150,760);
+  ctx.fillText("Back",500,760);
 
-  ctx.font="45px quizma";
-  ctx.fillStyle="rgba(255,255,255,"+salpha+")";
-  ctx.fillText(grid_types[grid],350,260);
-  ctx.fillText(flip_types[flip],350,360);
-  ctx.fillText(sfx_types[sfx],350,460);
-  ctx.fillText(music_types[music],350,560);
-  ctx.fillText(difficulty_types[difficulty],350,660);
+  // ctx.font="45px quizma";
+  // ctx.fillStyle="rgba(255,255,255,"+salpha+")";
 
   if (anistep<30){anistep++;}
 }
@@ -923,7 +997,7 @@ function update_click_coords()
 
 function main_menu_listener()
 {  
-  valid_options=[1,2]
+  valid_options=[1,2,5,6]
 
   if (valid_options.includes(menu_option))
   {
@@ -995,35 +1069,15 @@ function levels_listener()
 
 function settings_menu_listener()
 {
-  valid_options=[1,2,3,4,5,6]
+  valid_options=[2,5]
   if (valid_options.includes(menu_option))
   {
-    if (menu_option==1)
-    {
-      au.play("menu_option")
-      grid=(grid+1)%grid_types.length
-    }
     if (menu_option==2)
     {
       au.play("menu_option")
-      flip=(flip+1)%flip_types.length
+      sfx^=1
     }
-    if (menu_option==3)
-    {
-      au.play("menu_option")
-      sfx=(sfx+1)%sfx_types.length
-    }
-    if (menu_option==4)
-    {
-      au.play("menu_option")
-      music=(music+1)%music_types.length
-    }
-    if (menu_option==5)
-    {
-      au.play("menu_option")
-      difficulty=(difficulty+1)%difficulty_types.length
-    }
-    else if (menu_option==6)
+    else if (menu_option==5)
     {
       au.play("menu_back")
       ctx.canvas.removeEventListener("click", settings_menu_listener, false);
@@ -1049,7 +1103,12 @@ function credits_menu_listener()
     if (menu_option==3)
     {
       au.play("menu_option")
-      window.open('http://www.studiotypo.com/')
+      window.open('http://www.studiotypo.com/')//https://fonts.webtoolhub.com/font-n29145-space-age.aspx?lic=1
+    }    
+    if (menu_option==4)
+    {
+      au.play("menu_option")
+      window.open('https://fonts.webtoolhub.com/font-n29145-space-age.aspx?lic=1')
     }    
     if (menu_option==6)
     {
@@ -1116,6 +1175,10 @@ function mousedown(e)
   {
     if(mouse_coords.y==10)
     {
+      if(mouse_coords.x==6)
+      {
+        dragging_piece=6
+      }
       if(mouse_coords.x>0 && mouse_coords.x<4) //component
       {
         dragging_piece=mouse_coords.x
@@ -1140,7 +1203,7 @@ function mousedown(e)
         if(levels_completed>=nextl)
         {
           var sc=calculate_score()
-          if(sc<score[current_level])
+          if(sc<score[current_level] && sc!=0)
           {
             score[current_level]=sc
           }
@@ -1193,6 +1256,7 @@ function mousedown(e)
       if(mouse_coords.x==7)
       {
         anistep=1;
+        au.play("menu_back")
         clearTimeout(ani);
         ctx.canvas.removeEventListener("mousedown", mousedown);
         ctx.canvas.removeEventListener("mouseup", mouseup);
@@ -1228,7 +1292,7 @@ function mousedown(e)
 
 function mouseup(e)
 {
-  if(mouse_coords.y<10 && dragging_piece!=0)
+  if(mouse_coords.y<10 && dragging_piece!=0 && dragging_piece!=6)
   {
     if(board[mouse_coords.y][mouse_coords.x][0]<10)
     {
