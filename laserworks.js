@@ -34,6 +34,7 @@ selected={x:-1, y:-1}
 dragging_piece=0
 dragging_flipped=0
 filter_default_value=128
+brigthness_mod=0
 
 //
 
@@ -469,9 +470,9 @@ function draw_grid()
   ctx.font="25px sans-serif"
   ctx.strokeRect(10,1010,80,80)
   draw_line(90,1010,10,1090)
-  ctx.fillText("OPT", 15,1035)
+  ctx.fillText("BR+", 15,1035)
   ctx.textAlign="end"
-  ctx.fillText("---",85,1085)
+  ctx.fillText("BR-",85,1085)
 
 
   //reset button
@@ -644,7 +645,7 @@ function draw_laser_path(start)
   ic={x: coord_to_pixel(start[0].x), y: coord_to_pixel(start[0].y)}
   next=[]
   ctx.lineWidth=3
-  ctx.strokeStyle="red"
+  ctx.strokeStyle="rgb("+(256+brigthness_mod)+",0,0)"
   if(start[1][1]==0)
   {
     draw_line(ic.x+20, ic.y, ic.x+100, ic.y)
@@ -760,7 +761,7 @@ function follow_laser(coords,ori,str=256)
     }
 
     ctx.lineWidth=3
-    ctx.strokeStyle="rgb("+fstr+",0,0)"
+    ctx.strokeStyle="rgb("+(fstr+brigthness_mod)+",0,0)"
     if(coords.y==9 && ori==1)
     {
       draw_line(linestart.x, linestart.y, linestart.x+(it[1].x*100), linestart.y+(it[1].y*50))
@@ -901,12 +902,27 @@ function credits()
   //ctx.fillText("Music",800,360);
   ctx.fillText("SFX",750,460);
   ctx.fillText("Fonts",350,560);
-  ctx.fillStyle="rgba(255,255,255,"+(30*calpha/menu_alpha(850))+")";
+  
+
 
   ctx.textAlign="center"
-  ctx.fillText("Back",500,860);
+  ctx.fillText("Special Thanks",500,760)
+  ctx.fillStyle="rgba(255,255,255,"+(30*calpha/menu_alpha(950))+")";
+  ctx.fillText("Back",500,960);
 
+  ctx.fillStyle="white"
+  ctx.font="20px quizma"
+  ctx.fillText("❤",400,860)
+  ctx.fillText("❤",600,860)
   ctx.font="45px quizma";
+  
+  ctx.fillText("Lea",500,860)
+  ctx.textAlign="start"
+  ctx.fillText("q3muyq3",650,860)
+  ctx.textAlign="end"
+  ctx.fillText("Klon",350,860)
+  ctx.textAlign="center"
+
   ctx.fillStyle="rgba(255,255,255,"+(30*calpha/menu_alpha(350))+")";
   ctx.fillText("Achifaifa",500,360);
   ctx.fillStyle="rgba(255,255,255,"+(30*calpha/menu_alpha(450))+")";
@@ -915,6 +931,7 @@ function credits()
   ctx.fillText("Studio Typo",500,560);
   ctx.fillStyle="rgba(255,255,255,"+(50*calpha/menu_alpha(650))+")";
   ctx.fillText("Justin Callaghan",500,660);
+  
 
   if (anistep<30){anistep++}
 }
@@ -984,6 +1001,7 @@ function update_menu_option()
   else if(mouse_pos.y>620 && mouse_pos.y<670){menu_option=4;}
   else if(mouse_pos.y>720 && mouse_pos.y<770){menu_option=5;}
   else if(mouse_pos.y>820 && mouse_pos.y<870){menu_option=6;}
+  else if(mouse_pos.y>920 && mouse_pos.y<970){menu_option=7;}
   else {menu_option=-1}
 }
 
@@ -1088,7 +1106,7 @@ function settings_menu_listener()
 
 function credits_menu_listener()
 {
-  valid_options=[1,2,3,6]
+  valid_options=[1,2,3,7]
   {
     if (menu_option==1)
     {
@@ -1110,7 +1128,7 @@ function credits_menu_listener()
       au.play("menu_option")
       window.open('https://fonts.webtoolhub.com/font-n29145-space-age.aspx?lic=1')
     }    
-    if (menu_option==6)
+    if (menu_option==7)
     {
       au.play("menu_back")
       ctx.canvas.removeEventListener("click", credits_menu_listener, false);
@@ -1185,9 +1203,9 @@ function mousedown(e)
         dragging_flipped=0
         if(mouse_coords.x==3){dragging_flipped=filter_default_value}
       }
-      else if(mouse_coords.x==0) //menu
+      else if(mouse_coords.x==0) //brightness+
       {
-        console.log("game menu")
+        brigthness_mod+=32
       }
       else if(mouse_coords.x==8) //next level
       {
@@ -1248,6 +1266,10 @@ function mousedown(e)
     }
     if(mouse_coords.y==10)
     {
+      if(mouse_coords.x==0)
+      {
+        brigthness_mod-=32
+      }
       if(mouse_coords.x==3)
       {
         if(filter_default_value==8){filter_default_value=128}  //default filter mod
