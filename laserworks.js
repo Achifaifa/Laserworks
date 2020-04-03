@@ -776,8 +776,8 @@ function menu()
   // ctx.fillText("Tutorial",500,560);
   ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(750))+")";
   ctx.fillText("Settings",500,760);
-  // ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(850))+")";
-  // ctx.fillText("Credits",500,860);
+  ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(850))+")";
+  ctx.fillText("Credits",500,860);
 
   if (anistep<30){anistep++;} 
 }
@@ -836,24 +836,26 @@ function credits()
   ctx.font="60px quizma";
   ctx.fillText("Credits",950,200);
 
-  ctx.textAlign="center"
+  
   ctx.font="bold 50px quizma";
-  ctx.fillText("Code",350,260);
-  ctx.fillText("Music",750,460);
-  ctx.fillText("SFX",250,460);
-  ctx.fillText("Fonts",350,660);
+  ctx.fillText("Code",350,360);
+  //ctx.fillText("Music",800,360);
+  ctx.fillText("SFX",750,460);
+  ctx.fillText("Fonts",350,560);
   ctx.fillStyle="rgba(255,255,255,"+(30*calpha/menu_alpha(850))+")";
+
+  ctx.textAlign="center"
   ctx.fillText("Back",500,860);
 
   ctx.font="45px quizma";
-  ctx.fillStyle="rgba(255,255,255,"+(30*calpha/menu_alpha(250))+")";
-  ctx.fillText("Achifaifa",350,260);
   ctx.fillStyle="rgba(255,255,255,"+(30*calpha/menu_alpha(350))+")";
-  ctx.fillText("broumbroum",350,360);
-  ctx.fillStyle="rgba(255,255,255,"+(50*calpha/menu_alpha(450))+")";
-  ctx.fillText("Studio Typo",350,460);
+  ctx.fillText("Achifaifa",500,360);
+  ctx.fillStyle="rgba(255,255,255,"+(30*calpha/menu_alpha(450))+")";
+  ctx.fillText("broumbroum",500,460);
   ctx.fillStyle="rgba(255,255,255,"+(50*calpha/menu_alpha(550))+")";
-  ctx.fillText("Justin Callaghan",350,560);//https://fonts.webtoolhub.com/font-n29145-space-age.aspx?lic=1
+  ctx.fillText("Studio Typo",500,560);
+  ctx.fillStyle="rgba(255,255,255,"+(50*calpha/menu_alpha(650))+")";
+  ctx.fillText("Justin Callaghan",500,660);
 
   if (anistep<30){anistep++}
 }
@@ -936,7 +938,7 @@ function update_click_coords()
 
 function main_menu_listener()
 {  
-  valid_options=[1,2,5]
+  valid_options=[1,2,5,6]
 
   if (valid_options.includes(menu_option))
   {
@@ -1042,7 +1044,12 @@ function credits_menu_listener()
     if (menu_option==3)
     {
       au.play("menu_option")
-      window.open('http://www.studiotypo.com/')
+      window.open('http://www.studiotypo.com/')//https://fonts.webtoolhub.com/font-n29145-space-age.aspx?lic=1
+    }    
+    if (menu_option==4)
+    {
+      au.play("menu_option")
+      window.open('https://fonts.webtoolhub.com/font-n29145-space-age.aspx?lic=1')
     }    
     if (menu_option==6)
     {
