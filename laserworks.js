@@ -434,7 +434,7 @@ function draw_grid()
   }
   ctx.textAlign="center"
   ctx.strokeRect(810,1010,80,80)
-  ctx.fillText(current_level,850,1070)
+  ctx.fillText(parseInt(current_level)+1,850,1070)
   ctx.font="20px sans-serif"
   ctx.fillText("LEVEL",850,1040)
   ctx.strokeStyle="white"
