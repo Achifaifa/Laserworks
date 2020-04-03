@@ -34,6 +34,7 @@ selected={x:-1, y:-1}
 dragging_piece=0
 dragging_flipped=0
 filter_default_value=128
+brigthness_mod=0
 
 //
 
@@ -469,9 +470,9 @@ function draw_grid()
   ctx.font="25px sans-serif"
   ctx.strokeRect(10,1010,80,80)
   draw_line(90,1010,10,1090)
-  ctx.fillText("OPT", 15,1035)
+  ctx.fillText("BR+", 15,1035)
   ctx.textAlign="end"
-  ctx.fillText("---",85,1085)
+  ctx.fillText("BR-",85,1085)
 
 
   //reset button
@@ -644,7 +645,7 @@ function draw_laser_path(start)
   ic={x: coord_to_pixel(start[0].x), y: coord_to_pixel(start[0].y)}
   next=[]
   ctx.lineWidth=3
-  ctx.strokeStyle="red"
+  ctx.strokeStyle="rgb("+(256+brigthness_mod)+",0,0)"
   if(start[1][1]==0)
   {
     draw_line(ic.x+20, ic.y, ic.x+100, ic.y)
@@ -760,7 +761,7 @@ function follow_laser(coords,ori,str=256)
     }
 
     ctx.lineWidth=3
-    ctx.strokeStyle="rgb("+fstr+",0,0)"
+    ctx.strokeStyle="rgb("+(fstr+brigthness_mod)+",0,0)"
     if(coords.y==9 && ori==1)
     {
       draw_line(linestart.x, linestart.y, linestart.x+(it[1].x*100), linestart.y+(it[1].y*50))
@@ -1185,9 +1186,9 @@ function mousedown(e)
         dragging_flipped=0
         if(mouse_coords.x==3){dragging_flipped=filter_default_value}
       }
-      else if(mouse_coords.x==0) //menu
+      else if(mouse_coords.x==0) //brightness+
       {
-        console.log("game menu")
+        brigthness_mod+=32
       }
       else if(mouse_coords.x==8) //next level
       {
@@ -1248,6 +1249,10 @@ function mousedown(e)
     }
     if(mouse_coords.y==10)
     {
+      if(mouse_coords.x==0)
+      {
+        brigthness_mod-=32
+      }
       if(mouse_coords.x==3)
       {
         if(filter_default_value==8){filter_default_value=128}  //default filter mod
