@@ -878,7 +878,7 @@ function follow_laser(coords,ori,str=256)
   }
   else if(celltype==3 && str>cellvalue)//filter processing
   {
-    fstr=it[2]
+    fstr=cellvalue
   }
   else if(celltype==4) //trisplitter processing
   {
