@@ -5,15 +5,10 @@ ctx.canvas.width=1000
 ctx.canvas.height=1100
 ctx.lineCap="round"
 
-//
-
-version="0,2"
-
 //config
 
 fps=30
 interval=1000/fps
-
 sfx=1
 
 //
@@ -291,6 +286,7 @@ if(storedlevel==null)
 {
   window.localStorage.setItem('maxlevel', levels_completed)
   window.localStorage.setItem('score', JSON.stringify(score))
+  window.localStorage.setItem('sfx', 1)
 }
 else
 {
@@ -300,6 +296,7 @@ else
   if(score.length<total_levels){
     score=score.concat(Array(total_levels-score.length).fill(999))
   }
+  sfx=JSON.parse(window.localStorage.getItem('sfx'))
 }
 
 //Audio management
@@ -1224,6 +1221,7 @@ function settings_menu_listener()
     {
       au.play("menu_option")
       sfx^=1
+      window.localStorage.setItem('sfx',sfx)
     }
     else if (menu_option==5)
     {
@@ -1241,7 +1239,7 @@ function credits_menu_listener()
     if (menu_option==1)
     {
       au.play("menu_option")
-      window.open('https://github.com/achifaifa')
+      window.open('https://achi.se')
     }
     if (menu_option==2)
     {
@@ -1337,6 +1335,7 @@ function mousedown(e)
       else if(mouse_coords.x==0) //brightness+
       {
         brigthness_mod+=32
+        au.play("menu_option")
       }
       else if(mouse_coords.x==8) //next level
       {
@@ -1347,10 +1346,12 @@ function mousedown(e)
         }
         if(check_pass()==1 && levels_completed<nextl)
         {
+          au.play("menu_select")
           levels_completed=nextl
         }
         if(levels_completed>=nextl)
         {
+          au.play("menu_select")
           var sc=calculate_score()
           if(sc<score[current_level] && sc!=0)
           {
@@ -1364,6 +1365,7 @@ function mousedown(e)
       }
       else if(mouse_coords.x==7) //Reset button
       {
+        au.play("menu_back")
         load_level(current_level)
       }
     }
@@ -1381,6 +1383,7 @@ function mousedown(e)
     {
       if(board[mouse_coords.y][mouse_coords.x][0]==3)//filter value change
       {
+        au.play("menu_option")
         if(board[mouse_coords.y][mouse_coords.x][1]==8)
         {
           board[mouse_coords.y][mouse_coords.x][1]=128
@@ -1392,10 +1395,12 @@ function mousedown(e)
       }
       else if(board[mouse_coords.y][mouse_coords.x][0]==4)//trisplitter rotation
       {
+        au.play("menu_option")
         board[mouse_coords.y][mouse_coords.x][1]=(board[mouse_coords.y][mouse_coords.x][1]+1)%4
       }
       else
       {
+        au.play("menu_option")
         board[mouse_coords.y][mouse_coords.x][1]^=1 //flip piece
       }
     }
@@ -1403,15 +1408,18 @@ function mousedown(e)
     {
       if(mouse_coords.x==0)
       {
+        au.play("menu_option")
         brigthness_mod-=32
       }
       if(mouse_coords.x==3)
       {
+        au.play("menu_option")
         if(filter_default_value==8){filter_default_value=128}  //default filter mod
         else{filter_default_value/=2}
       }
       if(mouse_coords.x==4)
       {
+        au.play("menu_option")
         tri_default_rot=(tri_default_rot+1)%4
       }
       if(mouse_coords.x==7)
@@ -1428,6 +1436,7 @@ function mousedown(e)
       if(mouse_coords.x==8) // previous level
       {
         var nextl=current_level-1
+        if(nextl>=0){au.play("menu_back")}
         if(nextl<0)
         {
           nextl=0
@@ -1446,6 +1455,7 @@ function mousedown(e)
   {
     if(mouse_coords.y<10 && board[mouse_coords.y][mouse_coords.x][0]<10)
     {
+      au.play("menu_option")
       board[mouse_coords.y][mouse_coords.x]=[0,0]
     }
   }  
