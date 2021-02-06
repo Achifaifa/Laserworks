@@ -475,6 +475,7 @@ function draw_measure(coords)
   }
   ctx.lineWidth=1
   ctx.fillStyle="white"
+  ctx.textAlign="start"
 }
 
 // 0-right, 1-down, 2-left, 3-up
