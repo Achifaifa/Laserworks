@@ -1053,13 +1053,17 @@ function tutorial()
   if(tutorial_page==1){
     load_level("t1")
     ctx.font="bold 40px quizma";
-    ctx.fillText("Tools", 200,360)
-    ctx.fillText("Here are the tools you have to", 150,460)
-    ctx.fillText("redirect and modify lasers:", 150,510)
-    ctx.fillText("The mirror reflects a ray", 150,560)
-    ctx.fillText("    The splitter reflects half a ray", 150,610)
-    ctx.fillText("        The filter aborbs excess power", 150,660)
-    ctx.fillText("            The tri-splitter divides a ray in 3", 150,710)
+    ctx.fillText("Here are the tools you have to", 150,360)
+    ctx.fillText("redirect and modify lasers:", 150,410)
+    //
+    ctx.fillText("Reflects a ray", 100,560)
+    draw_line(150,580,150,750)
+    ctx.fillText("Reflects half the ray", 300,610)
+    draw_line(350,630,350,750)
+    ctx.fillText("Absorbs excess power", 500,660)
+    draw_line(550,680,550,750)
+    ctx.fillText("Divides a ray in 3", 600,710)
+    draw_line(752,730,752,750)
   }
   if(tutorial_page==2){
     load_level("t2")
