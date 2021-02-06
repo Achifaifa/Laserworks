@@ -462,7 +462,6 @@ function draw_measure(coords)
   ctx.lineWidth=2
   c={x:coord_to_pixel(coords.x), y:coord_to_pixel(coords.y)}
   ctx.strokeRect(c.x-40,c.y-40,80,80)
-  ctx.stroke()
   draw_line(c.x,c.y-50,c.x,c.y-30)
   draw_line(c.x,c.y+50,c.x,c.y+30)
   draw_line(c.x-50,c.y,c.x-30,c.y)
