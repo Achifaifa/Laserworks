@@ -296,6 +296,10 @@ else
 {
   levels_completed=storedlevel
   score=JSON.parse(window.localStorage.getItem('score'))
+  //fill in extra levels added after save
+  if(score.length<total_levels){
+    score=score.concat(Array(total_levels-score.length).fill(999))
+  }
 }
 
 //Audio management
