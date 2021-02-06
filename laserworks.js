@@ -15,7 +15,7 @@ sfx=1
 
 anistep=1
 ani=0
-tutorial_page=0
+tutorial_page=-1
 piece_size=(1000/12)-10
 dot_size=piece_size/5
 
@@ -42,6 +42,21 @@ current_level=0
 total_levels=30
 levels_completed=0
 score=Array(total_levels).fill(999)
+//tutorial levels
+levelt0=[
+[{x:1, y:8}, [10,0]],
+[{x:8, y:8}, [11,0,256]],
+]
+levelt1=[
+[{x:1, y:9}, [10,1]],
+[{x:1, y:8}, [1,1]],
+[{x:3, y:8}, [2,0]],
+[{x:5, y:8}, [3,64]],
+[{x:7, y:8}, [4,0]],
+[{x:9, y:8}, [11,0,256]],
+]
+levelt2=[]
+//normal levels
 level0=[
 [{x:1, y:1}, [10,0]],
 [{x:7, y:7}, [11,0,256]],
@@ -604,7 +619,7 @@ function draw_grid()
 
 function draw_game()
 {
-  draw_grid();
+  if(tutorial_page==-1){draw_grid()}
 
   for(i=0; i<board.length; i++)
   {
@@ -673,7 +688,7 @@ function draw_game()
   }
   ctx.strokeStyle="white"
 
-  draw_progress()
+  if(tutorial_page==-1 || tutorial_page==2){draw_progress()}
 }
 
 function check_pass()
@@ -959,9 +974,9 @@ function menu()
     ctx.fillText("Continue",500,360)
   }
   ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(450))+")";
-  ctx.fillText("Scores",500,460);
-  // ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(550))+")";
-  // ctx.fillText("Tutorial",500,560);
+  ctx.fillText("Levels",500,460);
+  ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(550))+")";
+  ctx.fillText("Tutorial",500,560);
   ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(750))+")";
   ctx.fillText("Settings",500,760);
   ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(850))+")";
@@ -1007,6 +1022,99 @@ function level_select()
   ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(850))+")";
   ctx.fillText("Back",500,860);
 
+  if (anistep<30){anistep++;} 
+}
+
+function tutorial()
+{
+  ctx.canvas.removeEventListener("click", main_menu_listener);
+  ctx.clearRect(0,0,1000,1100)
+  malpha=anistep/30;
+  ctx.lineWidth=1;
+
+  ctx.fillStyle="rgba(255,255,255,"+malpha+")";
+  ctx.textAlign="center";
+  ctx.font="100px spaceage";
+  ctx.fillText("Laserworks",500,160);
+  ctx.textAlign="end"
+  ctx.font="60px quizma";
+  ctx.fillText("Tutorial",950,200);
+  ctx.textAlign="start" 
+
+  if(tutorial_page==0){
+    load_level("t0")
+    ctx.font="bold 40px quizma";
+    ctx.fillText("Welcome to Laserworks", 200,360)
+    ctx.fillText("Your goal is to redirect lasers from ", 150,460)
+    ctx.fillText("the sources (>) to the targets (O)", 150,510)
+    ctx.fillText("Every source has a power of 255, the ", 150,560)
+    ctx.fillText("power targets need is on top of them", 150,610)
+  }
+  if(tutorial_page==1){
+    load_level("t1")
+    ctx.font="bold 40px quizma";
+    ctx.fillText("Tools", 200,360)
+    ctx.fillText("Here are the tools you have to", 150,460)
+    ctx.fillText("redirect and modify lasers:", 150,510)
+    ctx.fillText("The mirror reflects a ray", 150,560)
+    ctx.fillText("    The splitter reflects half a ray", 150,610)
+    ctx.fillText("        The filter aborbs excess power", 150,660)
+    ctx.fillText("            The tri-splitter divides a ray in 3", 150,710)
+  }
+  if(tutorial_page==2){
+    load_level("t2")
+    draw_grid()
+    ctx.font="bold 40px quizma";
+    ctx.fillText("This is where you'll be placing the tools", 150,310)
+    ctx.fillText("use left/right mouse on buttons", 150,360)
+    draw_line(140,450,50,450)
+    draw_line(50,450,50,950)
+    ctx.fillText("Laser brightness control", 150,460)
+    ctx.fillText("    Tool area (drag and drop to place, right click", 150,510)
+    ctx.fillText("    to change default value)", 150,550)
+    draw_line(170,500,150,500)
+    draw_line(150,500,150,950)
+    draw_line(150,950,450,950)
+    ctx.textAlign="end"
+    ctx.fillText("Meter: Drag over laser to see exact value", 950,610)
+    //draw_line()
+    draw_line(230,600,220,600)
+    draw_line(220,600,220,850)
+    draw_line(220,850,650,850)
+    draw_line(650,850,650,950)
+    ctx.fillText("Level completion indicator", 900,660)
+    draw_line(920,650,950,650)
+    draw_line(950,650,950,950)
+    ctx.fillText("Current level indicator", 800,710)
+    draw_line(820,700,850,700)
+    draw_line(850,700,850,950)
+    ctx.fillText("Reset level/Exit to menu", 700,760)
+    draw_line(720,750,750,750)
+    draw_line(750,750,750,950)
+  }
+  if(tutorial_page==3){
+    ctx.font="bold 40px quizma";
+    ctx.fillText("When all the targets are correctly fed, the ", 150,410)
+    ctx.fillText("current level indicator will turn green: click", 150,460)
+    ctx.fillText("on it to go to the next level, or right click ", 150,510)
+    ctx.fillText("on it to go to the previous one", 150,560)
+    ctx.fillText("Try using less pieces to solve a level to", 150,660)
+    ctx.fillText("increase your score, and have fun!", 150,710)
+
+  }
+
+  ctx.font="bold 50px quizma";
+  ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(950))+")";
+  if(tutorial_page!=3){
+    ctx.fillText("Next",600,960);
+  }
+  else{
+    ctx.fillText("Done",600,960)
+  }
+
+  ctx.fillStyle="white"
+  draw_game()
+  
   if (anistep<30){anistep++;} 
 }
 
@@ -1142,7 +1250,7 @@ function update_click_coords()
 
 function main_menu_listener()
 {  
-  valid_options=[1,2,5,6]
+  valid_options=[1,2,3,5,6]
 
   if (valid_options.includes(menu_option))
   {
@@ -1175,8 +1283,9 @@ function main_menu_listener()
       ctx.canvas.addEventListener("click", levels_listener, false);
       ani=setInterval(level_select, interval, false);
     }
-      if (menu_option==3){
+    if (menu_option==3){
       au.play("menu_select")
+      tutorial_page=0
       ctx.canvas.addEventListener("click", tutorial_listener, false);
       ani=setInterval(tutorial, interval, false);
     }
@@ -1192,6 +1301,19 @@ function main_menu_listener()
       ani=setInterval(credits, interval, 1);
       ctx.canvas.addEventListener("click", credits_menu_listener, false);
     }
+  }
+}
+
+function tutorial_listener()
+{
+
+  if(menu_option==7){
+    au.play("menu_select")
+    tutorial_page+=1
+  }
+  if(tutorial_page==4){
+      ctx.canvas.removeEventListener("click", tutorial_listener, false);
+      skip_to_menu(1,1)
   }
 }
 
@@ -1346,7 +1468,6 @@ function mousedown(e)
         }
         if(check_pass()==1 && levels_completed<nextl)
         {
-          au.play("menu_select")
           levels_completed=nextl
         }
         if(levels_completed>=nextl)
