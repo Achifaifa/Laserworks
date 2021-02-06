@@ -7,7 +7,7 @@ ctx.lineCap="round"
 
 //
 
-version="0,1"
+version="0,2"
 
 //config
 
@@ -34,6 +34,7 @@ selected={x:-1, y:-1}
 dragging_piece=0
 dragging_flipped=0
 filter_default_value=128
+tri_default_rot=0
 brigthness_mod=0
 
 //
@@ -43,7 +44,7 @@ power_grid=[]
 
 // Level data
 current_level=0
-total_levels=20
+total_levels=30
 levels_completed=0
 score=Array(total_levels).fill(999)
 level0=[
@@ -198,6 +199,77 @@ level19=[
 [{x:3, y:2}, [11,0,102]],
 [{x:7, y:9}, [11,0,126]],
 ]
+//Tri-splitters needed past this point
+level20=[
+[{x:3, y:7}, [10,0]],
+[{x:7, y:5}, [11,0,85]],
+[{x:3, y:2}, [11,0,85]],
+[{x:7, y:9}, [11,0,85]],
+]
+level21=[
+[{x:5, y:0}, [10,3]],
+[{x:1, y:3}, [11,0,85]],
+[{x:8, y:3}, [11,0,85]],
+[{x:1, y:7}, [11,0,28]],
+[{x:8, y:7}, [11,0,28]],
+]
+level22=[
+[{x:5, y:0}, [10,3]],
+[{x:1, y:3}, [11,0,56]],
+[{x:8, y:3}, [11,0,42]],
+[{x:1, y:7}, [11,0,42]],
+[{x:8, y:7}, [11,0,70]],
+]
+level23=[
+[{x:0, y:5}, [10,0]],
+[{x:9, y:5}, [10,2]],
+[{x:5, y:5}, [11,0,212]],
+]
+level24=[
+[{x:0, y:5}, [10,0]],
+[{x:9, y:5}, [10,2]],
+[{x:5, y:5}, [11,0,261]],
+[{x:4, y:5}, [11,0,17]],
+]
+level25=[
+[{x:0, y:0}, [10,3]],
+[{x:1, y:0}, [10,3]],
+[{x:2, y:0}, [10,3]],
+[{x:3, y:0}, [10,3]],
+[{x:7, y:9}, [11,0,298]],
+]
+level26=[
+[{x:2, y:8}, [10,0]],
+[{x:4, y:8}, [10,2]],
+[{x:7, y:5}, [11,0,212]],
+[{x:3, y:2}, [11,0,106]],
+]
+level27=[
+[{x:0, y:0}, [10,0]],
+[{x:9, y:0}, [10,3]],
+[{x:0, y:9}, [10,1]],
+[{x:9, y:9}, [10,2]],
+[{x:7, y:5}, [11,0,226]],
+[{x:3, y:2}, [11,0,226]],
+]
+level28=[
+[{x:9, y:3}, [10,3]],
+[{x:7, y:9}, [11,0,65]],
+[{x:0, y:0}, [11,0,34]],
+]
+level29=[
+[{x:3, y:1}, [10,3]],
+[{x:8, y:5}, [10,1]],
+[{x:9, y:0}, [10,2]],
+[{x:1, y:7}, [10,0]],
+[{x:7, y:5}, [11,0,20]],
+[{x:2, y:2}, [11,0,26]],
+[{x:7, y:9}, [11,0,26]],
+[{x:7, y:5}, [11,0,20]],
+[{x:3, y:6}, [11,0,26]],
+[{x:6, y:6}, [11,0,10]],
+[{x:7, y:2}, [11,0,52]],
+]
 
 //Mobile detection
 
@@ -224,6 +296,10 @@ else
 {
   levels_completed=storedlevel
   score=JSON.parse(window.localStorage.getItem('score'))
+  //fill in extra levels added after save
+  if(score.length<total_levels){
+    score=score.concat(Array(total_levels-score.length).fill(999))
+  }
 }
 
 //Audio management
@@ -331,6 +407,33 @@ function draw_filter(coords,fv=128)
   ctx.strokeRect(c.x-20,c.y-20,40,40)
   ctx.font="20px sans-serif"
   ctx.fillText(fv,c.x-20,c.y)
+}
+
+function draw_trisplitter(coords,rot=0)
+{
+  ctx.lineWidth=2
+  c={x:coord_to_pixel(coords.x), y:coord_to_pixel(coords.y)}
+  ctx.strokeRect(c.x-20,c.y-20,40,40)
+  if(rot==1)
+  {
+    draw_line(c.x-20,c.y-20,c.x,c.y)
+    draw_line(c.x+20,c.y-20,c.x,c.y)
+  }
+  else if(rot==2)
+  {
+    draw_line(c.x+20,c.y-20,c.x,c.y)
+    draw_line(c.x+20,c.y+20,c.x,c.y)
+  }
+  else if(rot==3)
+  {
+    draw_line(c.x-20,c.y+20,c.x,c.y)
+    draw_line(c.x+20,c.y+20,c.x,c.y)
+  }
+  else if(rot==0)
+  {
+    draw_line(c.x-20,c.y+20,c.x,c.y)
+    draw_line(c.x-20,c.y-20,c.x,c.y)
+  }
 }
 
 function draw_meter(coords)
@@ -463,6 +566,7 @@ function draw_grid()
   draw_mirror({x:1,y:10})
   draw_splitter({x:2,y:10})
   draw_filter({x:3,y:10},filter_default_value)
+  draw_trisplitter({x:4,y:10},tri_default_rot)
   draw_meter({x:6,y:10})
   ctx.fillStyle="white"
 
@@ -522,6 +626,10 @@ function draw_game()
       {
         draw_filter({x:i,y:j},ci[1])
       }
+      if(ci[0]==4)
+      {
+        draw_trisplitter({x:i,y:j},ci[1])
+      }
       if(ci[0]==10)
       {
         draw_laser({x:i,y:j},ci[1])
@@ -557,6 +665,10 @@ function draw_game()
   else if(dragging_piece==3)
   {
     draw_filter({x:mouse_coords.x, y: mouse_coords.y},dragging_flipped)
+  }
+  else if(dragging_piece==4)
+  {
+    draw_trisplitter({x:mouse_coords.x, y: mouse_coords.y},dragging_flipped)
   }
   else if(dragging_piece==6)
   {
@@ -682,95 +794,114 @@ function follow_laser(coords,ori,str=256)
     power_grid[coords.y][coords.x]+=str
   if (board[coords.y][coords.x][0]>9){return 0}
 
-  
-
   var linestart={x: coord_to_pixel(coords.x), y: coord_to_pixel(coords.y)}
   var nextr=[]
+
+  celltype=board[coords.y][coords.x][0]
+  cellvalue=board[coords.y][coords.x][1]
   
   //ray from left side
   if(ori==0)
   {
-    if(board[coords.y][coords.x][0]==0 || board[coords.y][coords.x][0]==3) {nextr=nextr.concat([[0,{x:+1, y:0},1]])}//nothing, filter
-    if(board[coords.y][coords.x][0]==1)//reflector
+    if(celltype==0 || celltype==3) {nextr=nextr.concat([[0,{x:+1, y:0},cellvalue]])}//nothing, filter
+    if(celltype==1)//reflector
     {
-      if(board[coords.y][coords.x][1]==0) {nextr=nextr.concat([[1,{x:0, y:+1},1]])}//Normal
-      if(board[coords.y][coords.x][1]==1) {nextr=nextr.concat([[3,{x:0, y:-1},1]])}//Flipped
+      if(cellvalue==0) {nextr=nextr.concat([[1,{x:0, y:+1}]])}//Normal
+      if(cellvalue==1) {nextr=nextr.concat([[3,{x:0, y:-1}]])}//Flipped
     }
-    if(board[coords.y][coords.x][0]==2)//splitter
+    if(celltype==2)//splitter
     {
-      if(board[coords.y][coords.x][1]==0) {nextr=nextr.concat([[1,{x:0, y:+1},2], [0,{x:+1, y:0},2]])}//Normal
-      if(board[coords.y][coords.x][1]==1) {nextr=nextr.concat([[3,{x:0, y:-1},2], [0,{x:+1, y:0},2]])}//Flipped
+      if(cellvalue==0) {nextr=nextr.concat([[1,{x:0, y:+1}], [0,{x:+1, y:0}]])}//Normal
+      if(cellvalue==1) {nextr=nextr.concat([[3,{x:0, y:-1}], [0,{x:+1, y:0}]])}//Flipped
+    }
+    if(celltype==4 && cellvalue==ori)//trisplitter in same orientation
+    {
+      nextr=nextr.concat([[3,{x:0,y:-1}],[1,{x:0,y:+1}],[0,{x:1,y:0}]])
     }
   }
   if(ori==1)//ray from top
   {
-    if(board[coords.y][coords.x][0]==0 || board[coords.y][coords.x][0]==3) {nextr=nextr.concat([[1,{x:0, y:+1},1]])}//nothing, filter
-    if(board[coords.y][coords.x][0]==1)//reflector
+    if(celltype==0 || celltype==3) {nextr=nextr.concat([[1,{x:0, y:+1},1]])}//nothing, filter
+    if(celltype==1)//reflector
     {
-      if(board[coords.y][coords.x][1]==0) {nextr=nextr.concat([[0,{x:+1, y:0},1]])} //Normal
-      if(board[coords.y][coords.x][1]==1) {nextr=nextr.concat([[2,{x:-1, y:0},1]])}//Flipped
+      if(cellvalue==0) {nextr=nextr.concat([[0,{x:+1, y:0},1]])} //Normal
+      if(cellvalue==1) {nextr=nextr.concat([[2,{x:-1, y:0},1]])}//Flipped
     }
-    if(board[coords.y][coords.x][0]==2)//splitter
+    if(celltype==2)//splitter
     {
-      if(board[coords.y][coords.x][1]==0) {nextr=nextr.concat([[0,{x:+1, y:0},2], [1,{x:0, y:+1},2]])}//Normal
-      if(board[coords.y][coords.x][1]==1) {nextr=nextr.concat([[2,{x:-1, y:0},2], [1,{x:0, y:+1},2]])}//Flipped
+      if(cellvalue==0) {nextr=nextr.concat([[0,{x:+1, y:0},2], [1,{x:0, y:+1},2]])}//Normal
+      if(cellvalue==1) {nextr=nextr.concat([[2,{x:-1, y:0},2], [1,{x:0, y:+1},2]])}//Flipped
+    }
+    if(celltype==4 && cellvalue==ori)//trisplitter in same orientation
+    {
+      nextr=nextr.concat([[2,{x:-1,y:0}],[1,{x:0,y:+1}],[0,{x:1,y:0}]])
     }
   }
   if(ori==2)//ray from right side
   {
-    if(board[coords.y][coords.x][0]==0 || board[coords.y][coords.x][0]==3) {nextr=nextr.concat([[2,{x:-1, y:0},1]])}//nothing, filter
-    if(board[coords.y][coords.x][0]==1)//reflector
+    if(celltype==0 || celltype==3) {nextr=nextr.concat([[2,{x:-1, y:0},1]])}//nothing, filter
+    if(celltype==1)//reflector
     {
-      if(board[coords.y][coords.x][1]==0) {nextr=nextr.concat([[3,{x:0, y:-1},1]])}//Normal
-      if(board[coords.y][coords.x][1]==1) {nextr=nextr.concat([[1,{x:0, y:1},1]])}//Flipped
+      if(cellvalue==0) {nextr=nextr.concat([[3,{x:0, y:-1},1]])}//Normal
+      if(cellvalue==1) {nextr=nextr.concat([[1,{x:0, y:1},1]])}//Flipped
     }
-    if(board[coords.y][coords.x][0]==2)//splitter
+    if(celltype==2)//splitter
     {
-      if(board[coords.y][coords.x][1]==0) {nextr=nextr.concat([[3,{x:0, y:-1},2], [2,{x:-1, y:0},2]])}//Normal
-      if(board[coords.y][coords.x][1]==1) {nextr=nextr.concat([[1,{x:0, y:1},2], [2,{x:-1, y:0},2]])}//Flipped
+      if(cellvalue==0) {nextr=nextr.concat([[3,{x:0, y:-1},2], [2,{x:-1, y:0},2]])}//Normal
+      if(cellvalue==1) {nextr=nextr.concat([[1,{x:0, y:1},2], [2,{x:-1, y:0},2]])}//Flipped
+    }
+    if(celltype==4 && cellvalue==ori)//trisplitter in same orientation
+    {
+      nextr=nextr.concat([[3,{x:0,y:-1}],[2,{x:-1,y:0}],[1,{x:0,y:+1}]])
     }
   }
   if(ori==3)//ray from bottom
   {
-    if(board[coords.y][coords.x][0]==0 || board[coords.y][coords.x][0]==3) {nextr=nextr.concat([[3,{x:0, y:-1},1]])}//nothing, filter
-    if(board[coords.y][coords.x][0]==1)//reflector
+    if(celltype==0 || celltype==3) {nextr=nextr.concat([[3,{x:0, y:-1},1]])}//nothing, filter
+    if(celltype==1)//reflector
     {
-      if(board[coords.y][coords.x][1]==0) {nextr=nextr.concat([[2,{x:-1, y:0},1]])}//Normal
-      if(board[coords.y][coords.x][1]==1) {nextr=nextr.concat([[0,{x:1, y:0},1]])}//Flipped
+      if(cellvalue==0) {nextr=nextr.concat([[2,{x:-1, y:0},1]])}//Normal
+      if(cellvalue==1) {nextr=nextr.concat([[0,{x:1, y:0},1]])}//Flipped
     }
-    if(board[coords.y][coords.x][0]==2)//splitter
+    if(celltype==2)//splitter
     {
-      if(board[coords.y][coords.x][1]==0) {nextr=nextr.concat([[2,{x:-1, y:0},2], [3,{x:0, y:-1},2]])}//Normal
-      if(board[coords.y][coords.x][1]==1) {nextr=nextr.concat([[0,{x:1, y:0},2], [3,{x:0, y:-1},2]])}//Flipped
+      if(cellvalue==0) {nextr=nextr.concat([[2,{x:-1, y:0},2], [3,{x:0, y:-1},2]])}//Normal
+      if(cellvalue==1) {nextr=nextr.concat([[0,{x:1, y:0},2], [3,{x:0, y:-1},2]])}//Flipped
+    }
+    if(celltype==4 && cellvalue==ori)//trisplitter in same orientation
+    {
+      nextr=nextr.concat([[2,{x:-1,y:0}],[3,{x:0,y:-1}],[0,{x:1,y:0}]])
     }
   }
+
+  var fstr=str
+  //modify laser strength
+  if(celltype==2)//reflector processing
+  {
+    fstr=Math.floor(str/2)
+  }
+  else if(celltype==3 && str>cellvalue)//filter processing
+  {
+    fstr=cellvalue
+  }
+  else if(celltype==4) //trisplitter processing
+  {
+    fstr=Math.floor(str/3)
+  }
+
   for(var i=0; i<nextr.length; i++)
   {
-
     var it=nextr[i]
     var next={x:coords.x+it[1].x, y:coords.y+it[1].y}
 
-
-    if(board[coords.y][coords.x][0]==3 && fstr>board[coords.y][coords.x][1])//filter processing
-    {
-      fstr=board[coords.y][coords.x][1]
-    }
-    else
-    {
-      fstr=str/it[2]
-    }
-
+    //draw line
     ctx.lineWidth=3
     ctx.strokeStyle="rgb("+(fstr+brigthness_mod)+",0,0)"
-    if(coords.y==9 && ori==1)
-    {
-      draw_line(linestart.x, linestart.y, linestart.x+(it[1].x*100), linestart.y+(it[1].y*50))
-    }
-    else
-    {
-      draw_line(linestart.x, linestart.y, linestart.x+(it[1].x*100), linestart.y+(it[1].y*100))
-    }
+    if(coords.y==9 && ori==1) {draw_line(linestart.x, linestart.y, linestart.x+(it[1].x*100), linestart.y+(it[1].y*50))} //exception for last row
+    else                      {draw_line(linestart.x, linestart.y, linestart.x+(it[1].x*100), linestart.y+(it[1].y*100))}
     ctx.lineWidth=1
+
+    //continue laser
     follow_laser(next, it[0], fstr)
   }
 }
@@ -969,7 +1100,6 @@ function settings()
 
   if (anistep<30){anistep++;}
 }
-
 
 function main_loop()
 {
@@ -1193,15 +1323,16 @@ function mousedown(e)
   {
     if(mouse_coords.y==10)
     {
-      if(mouse_coords.x==6)
+      if(mouse_coords.x==6) //meter
       {
         dragging_piece=6
       }
-      if(mouse_coords.x>0 && mouse_coords.x<4) //component
+      if(mouse_coords.x>0 && mouse_coords.x<5) //component
       {
         dragging_piece=mouse_coords.x
         dragging_flipped=0
         if(mouse_coords.x==3){dragging_flipped=filter_default_value}
+        if(mouse_coords.x==4){dragging_flipped=tri_default_rot}
       }
       else if(mouse_coords.x==0) //brightness+
       {
@@ -1248,7 +1379,7 @@ function mousedown(e)
   {
     if(mouse_coords.y<10 && board[mouse_coords.y][mouse_coords.x][0]<10)
     {
-      if(board[mouse_coords.y][mouse_coords.x][0]==3)
+      if(board[mouse_coords.y][mouse_coords.x][0]==3)//filter value change
       {
         if(board[mouse_coords.y][mouse_coords.x][1]==8)
         {
@@ -1258,6 +1389,10 @@ function mousedown(e)
         {
           board[mouse_coords.y][mouse_coords.x][1]/=2
         }
+      }
+      else if(board[mouse_coords.y][mouse_coords.x][0]==4)//trisplitter rotation
+      {
+        board[mouse_coords.y][mouse_coords.x][1]=(board[mouse_coords.y][mouse_coords.x][1]+1)%4
       }
       else
       {
@@ -1274,6 +1409,10 @@ function mousedown(e)
       {
         if(filter_default_value==8){filter_default_value=128}  //default filter mod
         else{filter_default_value/=2}
+      }
+      if(mouse_coords.x==4)
+      {
+        tri_default_rot=(tri_default_rot+1)%4
       }
       if(mouse_coords.x==7)
       {
@@ -1340,6 +1479,9 @@ function dragmove(e)
         break
       case 3: 
         draw_filter(mouse_coords, dragging_flipped)
+        break
+      case 4:
+        draw_trisplitter(mouse_coords, dragging_flipped)
         break
     }
     ctx.strokeStyle="white"
