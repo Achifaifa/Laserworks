@@ -1071,7 +1071,7 @@ function tutorial()
     draw_line(50,450,50,950)
     ctx.fillText("Laser brightness control", 150,460)
     ctx.fillText("    Tool area (drag and drop to place, right click", 150,510)
-    ctx.fillText("    to change default value)", 150,550)
+    ctx.fillText("    to change default value, mid click to delete)", 150,550)
     draw_line(170,500,150,500)
     draw_line(150,500,150,950)
     draw_line(150,950,450,950)
@@ -1312,6 +1312,7 @@ function tutorial_listener()
     tutorial_page+=1
   }
   if(tutorial_page==4){
+      tutorial_page=-1
       ctx.canvas.removeEventListener("click", tutorial_listener, false);
       skip_to_menu(1,1)
   }
