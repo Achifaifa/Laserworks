@@ -20,6 +20,7 @@ piece_size=(1000/12)-10
 dot_size=piece_size/5
 
 //
+
 mouse_coords={x:0,y:0}
 mouse_pos={x:0,y:0}
 click_coords={x:-1, y:-1}
@@ -281,7 +282,7 @@ level29=[
 [{x:7, y:2}, [11,0,52]],
 ]
 
-//Mobile detection
+//Mobile detection (Disables menu alpha)
 
 try{document.createEvent("TouchEvent"); mobile=1;}
 catch(e){mobile=0}
@@ -308,30 +309,23 @@ else
   levels_completed=storedlevel
   score=JSON.parse(window.localStorage.getItem('score'))
   //fill in extra levels added after save
-  if(score.length<total_levels){
-    score=score.concat(Array(total_levels-score.length).fill(999))
-  }
+  if(score.length<total_levels){score=score.concat(Array(total_levels-score.length).fill(999))}
   sfx=JSON.parse(window.localStorage.getItem('sfx'))
 }
 
 //Audio management
-
-au=new Object();
-
-au.play=function(s)
-{
-  if (sfx==1)
-  {
-    tem=eval("this."+s+".cloneNode();")
-    tem.play()
-  }
-}
 
 sounds=[
 "menu_back",
 "menu_select",
 "menu_option",
 ]
+
+au=new Object();
+au.play=function(s)
+{
+  if (sfx==1){tem=eval("this."+s+".cloneNode();"); tem.play()}
+}
 
 function loader()
 {
@@ -343,7 +337,7 @@ function loader()
   }
 }
 
-//Auxiliary functions
+//Auxiliary draw functions
 
 function draw_line(x1,y1,x2,y2)
 {
@@ -381,14 +375,8 @@ function draw_mirror(coords,rot=0)
 {
   ctx.lineWidth=2
   c={x:coord_to_pixel(coords.x), y:coord_to_pixel(coords.y)}
-  if(rot==0)
-  {
-    draw_line(c.x-40,c.y-40,c.x+40,c.y+40)
-  }
-  else if(rot==1)
-  {
-    draw_line(c.x-40,c.y+40,c.x+40,c.y-40)
-  }
+  if(rot==0)      {draw_line(c.x-40,c.y-40,c.x+40,c.y+40)}
+  else if(rot==1) {draw_line(c.x-40,c.y+40,c.x+40,c.y-40)}
   ctx.lineWidth=1
 }
 
@@ -408,7 +396,6 @@ function draw_splitter(coords,rot=0)
     draw_line(c.x-8,c.y+8,c.x+8,c.y-8)
     draw_line(c.x+24,c.y-24,c.x+40,c.y-40)
   }
-
   ctx.lineWidth=1
 }
 
@@ -484,7 +471,6 @@ function draw_laser(coords, or=0)
   c={x:coord_to_pixel(coords.x), y:coord_to_pixel(coords.y)}
   if(or%2==0)
   {
-    
     if(or==0){
       draw_line(c.x-20, c.y-20, c.x-20, c.y+20)
       draw_line(c.x-20, c.y+20, c.x+20, c.y)
@@ -535,7 +521,6 @@ function draw_target(coords, nd)
   ctx.strokeStyle="white"
 
   //overload
-
   if(pw>nd)
   {
     var unit=2*Math.PI/nd
@@ -545,24 +530,7 @@ function draw_target(coords, nd)
     ctx.arc(c.x, c.y, 20, -Math.PI/2, (unit*(pw-nd))-(Math.PI/2));
     ctx.stroke()
     ctx.strokeStyle="white"
-
   }
-}
-
-function pixel_to_coord(px)
-{
-  return Math.ceil(px/(100))-1
-}
-
-function coord_to_pixel(c)
-{
-  return (50)*(1+(c*2))
-}
-
-function menu_alpha(y)
-{
-  if (mobile==0){return Math.abs(y-mouse_pos.y)}
-  else {return 50}
 }
 
 function draw_grid()
@@ -590,7 +558,6 @@ function draw_grid()
   ctx.textAlign="end"
   ctx.fillText("BR-",85,1085)
 
-
   //reset button
   ctx.textAlign="start"
   ctx.strokeRect(710,1010,80,80)
@@ -600,14 +567,8 @@ function draw_grid()
   ctx.fillText("ESC",785,1085)
 
   //level load
-  if (check_pass()==1 || levels_completed-1>=current_level)
-  {
-    ctx.strokeStyle="green"
-  }
-  else
-  {
-    ctx.strokeStyle="red"
-  }
+  if (check_pass()==1 || levels_completed-1>=current_level) {ctx.strokeStyle="green"}
+  else {ctx.strokeStyle="red"}
   ctx.textAlign="center"
   ctx.strokeRect(810,1010,80,80)
   ctx.fillText(parseInt(current_level)+1,850,1070)
@@ -626,103 +587,30 @@ function draw_game()
     for(j=0; j<board[0].length; j++)
     {
       ci=board[j][i]
-      if(ci[0]==1)
-      {
-        draw_mirror({x:i,y:j},ci[1])
-      }
-      if(ci[0]==2)
-      {
-        draw_splitter({x:i,y:j},ci[1])
-      }
-      if(ci[0]==3)
-      {
-        draw_filter({x:i,y:j},ci[1])
-      }
-      if(ci[0]==4)
-      {
-        draw_trisplitter({x:i,y:j},ci[1])
-      }
-      if(ci[0]==10)
-      {
-        draw_laser({x:i,y:j},ci[1])
-      }
-      if(ci[0]==11)
-      {
-        draw_target({x:i,y:j},ci[2])
-      }
+      if(ci[0]==1)  {draw_mirror({x:i,y:j},ci[1])}
+      if(ci[0]==2)  {draw_splitter({x:i,y:j},ci[1])}
+      if(ci[0]==3)  {draw_filter({x:i,y:j},ci[1])}
+      if(ci[0]==4)  {draw_trisplitter({x:i,y:j},ci[1])}
+      if(ci[0]==10) {draw_laser({x:i,y:j},ci[1])}
+      if(ci[0]==11) {draw_target({x:i,y:j},ci[2])}
     }
   }
 
   //Draw laser path
   reset_pgrid()
   lvd=eval("level"+current_level)
-  for(i=0; i<lvd.length; i++)
-  {
-    if(lvd[i][1][0]==10)
-    {
-      draw_laser_path(lvd[i])
-    }
-  }
+  for(i=0; i<lvd.length; i++) {if(lvd[i][1][0]==10){draw_laser_path(lvd[i])}}
 
   //Draw dragging piece
   ctx.strokeStyle="rgb(255,128,0)"
-  if(dragging_piece==1)
-  {
-    draw_mirror({x:mouse_coords.x, y: mouse_coords.y},dragging_flipped)
-  }
-  else if(dragging_piece==2)
-  {
-    draw_splitter({x:mouse_coords.x, y: mouse_coords.y},dragging_flipped)
-  }
-  else if(dragging_piece==3)
-  {
-    draw_filter({x:mouse_coords.x, y: mouse_coords.y},dragging_flipped)
-  }
-  else if(dragging_piece==4)
-  {
-    draw_trisplitter({x:mouse_coords.x, y: mouse_coords.y},dragging_flipped)
-  }
-  else if(dragging_piece==6)
-  {
-    draw_measure({x:mouse_coords.x, y: mouse_coords.y})
-  }
+  if(dragging_piece==1)       {draw_mirror({x:mouse_coords.x, y: mouse_coords.y},dragging_flipped)}
+  else if(dragging_piece==2)  {draw_splitter({x:mouse_coords.x, y: mouse_coords.y},dragging_flipped)}
+  else if(dragging_piece==3)  {draw_filter({x:mouse_coords.x, y: mouse_coords.y},dragging_flipped)}
+  else if(dragging_piece==4)  {draw_trisplitter({x:mouse_coords.x, y: mouse_coords.y},dragging_flipped)}
+  else if(dragging_piece==6)  {draw_measure({x:mouse_coords.x, y: mouse_coords.y})}
   ctx.strokeStyle="white"
 
   if(tutorial_page==-1 || tutorial_page==2){draw_progress()}
-}
-
-function check_pass()
-{
-  var lvd=eval("level"+current_level)
-  var completed=1
-  for(var i=0; i<lvd.length; i++)
-  {
-    if(lvd[i][1].length==3)//Process targets
-    {
-      if (lvd[i][1][2]!=power_grid[lvd[i][0].y][lvd[i][0].x]) //Check if the target has OK levels
-      {
-        return 0
-      }
-    }
-  }
-  return 1
-}
-
-function calculate_score()
-{
-  var tempscore=0
-  for(var i=0; i<10; i++)
-  {
-    for(var j=0; j<10; j++)
-    {
-      var t=board[j][i][0]
-      if(t!=10 && t!=11)
-      {
-        tempscore+=t
-      }
-    }
-  }
-  return tempscore
 }
 
 function draw_progress()
@@ -765,7 +653,6 @@ function draw_progress()
 // 0-right, 1-down, 2-left, 3-up
 function draw_laser_path(start)
 {
-
   ic={x: coord_to_pixel(start[0].x), y: coord_to_pixel(start[0].y)}
   next=[]
   ctx.lineWidth=3
@@ -888,18 +775,9 @@ function follow_laser(coords,ori,str=256)
 
   var fstr=str
   //modify laser strength
-  if(celltype==2)//reflector processing
-  {
-    fstr=Math.floor(str/2)
-  }
-  else if(celltype==3 && str>cellvalue)//filter processing
-  {
-    fstr=cellvalue
-  }
-  else if(celltype==4) //trisplitter processing
-  {
-    fstr=Math.floor(str/3)
-  }
+  if(celltype==2)                       {fstr=Math.floor(str/2)}  //reflector processing
+  else if(celltype==3 && str>cellvalue) {fstr=cellvalue}          //filter processing
+  else if(celltype==4)                  {fstr=Math.floor(str/3)}  //trisplitter processing
 
   for(var i=0; i<nextr.length; i++)
   {
@@ -916,6 +794,58 @@ function follow_laser(coords,ori,str=256)
     //continue laser
     follow_laser(next, it[0], fstr)
   }
+}
+
+//Misc auxiliary functions
+
+function pixel_to_coord(px)
+{
+  return Math.ceil(px/(100))-1
+}
+
+function coord_to_pixel(c)
+{
+  return (50)*(1+(c*2))
+}
+
+function menu_alpha(y)
+{
+  if (mobile==0){return Math.abs(y-mouse_pos.y)}
+  else {return 50}
+}
+
+function check_pass()
+{
+  var lvd=eval("level"+current_level)
+  var completed=1
+  for(var i=0; i<lvd.length; i++)
+  {
+    if(lvd[i][1].length==3)//Process targets
+    {
+      if (lvd[i][1][2]!=power_grid[lvd[i][0].y][lvd[i][0].x]) //Check if the target has OK levels
+      {
+        return 0
+      }
+    }
+  }
+  return 1
+}
+
+function calculate_score()
+{
+  var tempscore=0
+  for(var i=0; i<10; i++)
+  {
+    for(var j=0; j<10; j++)
+    {
+      var t=board[j][i][0]
+      if(t!=10 && t!=11)
+      {
+        tempscore+=t
+      }
+    }
+  }
+  return tempscore
 }
 
 //Intro and menus
@@ -965,14 +895,8 @@ function menu()
 
   ctx.font="bold 50px quizma";
   ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(350))+")";
-  if(levels_completed==0)
-  {
-    ctx.fillText("New game",500,360);
-  }
-  else
-  {
-    ctx.fillText("Continue",500,360)
-  }
+  if(levels_completed==0) {ctx.fillText("New game",500,360);}
+  else                    {ctx.fillText("Continue",500,360)}
   ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(450))+")";
   ctx.fillText("Levels",500,460);
   ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(550))+")";
@@ -1006,14 +930,8 @@ function level_select()
     for(j=0; j<10; j++)
     {
       var sc=score[j*10+i]
-      if(typeof(sc)!="undefined" && sc!=999)
-      {
-        ctx.fillText(sc, 100+90*i, 350+90*j)
-      }
-      else if(sc==999)
-      {
-        ctx.fillText("--", 100+90*i, 350+90*j)
-      }
+      if(typeof(sc)!="undefined" && sc!=999)  {ctx.fillText(sc, 100+90*i, 350+90*j)}
+      else if(sc==999)                        {ctx.fillText("--", 100+90*i, 350+90*j)}
     }
   }
 
@@ -1055,7 +973,6 @@ function tutorial()
     ctx.font="bold 40px quizma";
     ctx.fillText("Here are the tools you have to", 150,360)
     ctx.fillText("redirect and modify lasers:", 150,410)
-    //
     ctx.fillText("Reflects a ray", 100,560)
     draw_line(150,580,150,750)
     ctx.fillText("Reflects half the ray", 300,610)
@@ -1081,7 +998,6 @@ function tutorial()
     draw_line(150,950,450,950)
     ctx.textAlign="end"
     ctx.fillText("Meter: Drag over laser to see exact value", 950,610)
-    //draw_line()
     draw_line(230,600,220,600)
     draw_line(220,600,220,850)
     draw_line(220,850,650,850)
@@ -1104,18 +1020,12 @@ function tutorial()
     ctx.fillText("on it to go to the previous one", 150,560)
     ctx.fillText("Try using less pieces to solve a level to", 150,660)
     ctx.fillText("increase your score, and have fun!", 150,710)
-
   }
 
   ctx.font="bold 50px quizma";
   ctx.fillStyle="rgba(255,255,255,"+(30*malpha/menu_alpha(950))+")";
-  if(tutorial_page!=3){
-    ctx.fillText("Next",600,960);
-  }
-  else{
-    ctx.fillText("Done",600,960)
-  }
-
+  if(tutorial_page!=3)  {ctx.fillText("Next",600,960);}
+  else                  {ctx.fillText("Done",600,960)}
   ctx.fillStyle="white"
   draw_game()
   
@@ -1125,7 +1035,6 @@ function tutorial()
 function credits()
 {
   ctx.clearRect(0,0,1000,1000)
-
   calpha=anistep/30
 
   ctx.fillStyle="rgba(255,255,255,"+calpha+")";
@@ -1136,15 +1045,11 @@ function credits()
   ctx.font="60px quizma";
   ctx.fillText("Credits",950,200);
 
-  
   ctx.font="bold 50px quizma";
   ctx.fillText("Code",350,360);
-  //ctx.fillText("Music",800,360);
   ctx.fillText("SFX",750,460);
   ctx.fillText("Fonts",350,560);
   
-
-
   ctx.textAlign="center"
   ctx.fillText("Special Thanks",500,760)
   ctx.fillStyle="rgba(255,255,255,"+(30*calpha/menu_alpha(950))+")";
@@ -1172,7 +1077,6 @@ function credits()
   ctx.fillStyle="rgba(255,255,255,"+(50*calpha/menu_alpha(650))+")";
   ctx.fillText("Justin Callaghan",500,660);
   
-
   if (anistep<30){anistep++}
 }
 
@@ -1192,20 +1096,10 @@ function settings()
 
   ctx.textAlign="center"
   ctx.fillStyle="rgba(255,255,255,"+(30*salpha/menu_alpha(400))+")";
-  if(sfx==1)
-  {
-    ctx.fillText("SFX on",500,460);
-  }
-  else
-  {
-    ctx.fillText("SFX off",500,460);
-  }
-  
+  if(sfx==1)  {ctx.fillText("SFX on",500,460);}
+  else        {ctx.fillText("SFX off",500,460);}
   ctx.fillStyle="rgba(255,255,255,"+(30*salpha/menu_alpha(700))+")";
   ctx.fillText("Back",500,760);
-
-  // ctx.font="45px quizma";
-  // ctx.fillStyle="rgba(255,255,255,"+salpha+")";
 
   if (anistep<30){anistep++;}
 }
@@ -1213,13 +1107,11 @@ function settings()
 function main_loop()
 {
   ctx.clearRect(0,0,1000,1100);
-
   draw_grid();
   draw_game();
 }
 
 //Listeners
-
 
 function skip_to_menu(e,mute=0)
 {
@@ -1234,7 +1126,7 @@ function skip_to_menu(e,mute=0)
 
 function update_menu_option()
 {
-       if(mouse_pos.y>320 && mouse_pos.y<370){menu_option=1;}
+  if(mouse_pos.y>320 && mouse_pos.y<370){menu_option=1;}
   else if(mouse_pos.y>420 && mouse_pos.y<470){menu_option=2;}
   else if(mouse_pos.y>520 && mouse_pos.y<570){menu_option=3;}
   else if(mouse_pos.y>620 && mouse_pos.y<670){menu_option=4;}
@@ -1267,10 +1159,7 @@ function main_menu_listener()
       if(levels_completed>0)
       {
         inilevel=levels_completed
-        if(inilevel>=total_levels)
-        {
-          inilevel=total_levels-1
-        }
+        if(inilevel>=total_levels) {inilevel=total_levels-1}
       }
       load_level(inilevel)
       au.play("menu_select")
@@ -1310,7 +1199,6 @@ function main_menu_listener()
 
 function tutorial_listener()
 {
-
   if(menu_option==7){
     au.play("menu_select")
     tutorial_page+=1
@@ -1402,18 +1290,12 @@ function skip_listener()
 
 function initialize_board()
 {
-  for (i=0; i<10; i++)
-  {
-    board[i]=Array(10).fill([0,0])
-  }
+  for (i=0; i<10; i++) {board[i]=Array(10).fill([0,0])}
 }
 
 function reset_pgrid()
 {
-  for (i=0; i<10; i++)
-  {
-    power_grid[i]=Array(10).fill(0)
-  }
+  for (i=0; i<10; i++){power_grid[i]=Array(10).fill(0)}
 }
 
 function load_level(lv)
@@ -1572,7 +1454,6 @@ function mousedown(e)
           current_level=nextl
           load_level(current_level)
         }
-        
       }
     } 
   }
@@ -1607,18 +1488,10 @@ function dragmove(e)
     ctx.strokeStyle="rgb(255,128,0)"
     switch(dragging_piece)
     {
-      case 1:
-        draw_mirror(mouse_coords, dragging_flipped)
-        break
-      case 2: 
-        draw_splitter(mouse_coords, dragging_flipped)
-        break
-      case 3: 
-        draw_filter(mouse_coords, dragging_flipped)
-        break
-      case 4:
-        draw_trisplitter(mouse_coords, dragging_flipped)
-        break
+      case 1: draw_mirror(mouse_coords, dragging_flipped)       ;break
+      case 2: draw_splitter(mouse_coords, dragging_flipped)     ;break
+      case 3: draw_filter(mouse_coords, dragging_flipped)       ;break
+      case 4: draw_trisplitter(mouse_coords, dragging_flipped)  ;break
     }
     ctx.strokeStyle="white"
   }
